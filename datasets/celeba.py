@@ -10,6 +10,7 @@ import cv2
 import torch
 from torch.utils.data import Dataset
 import numpy as np
+from matplotlib import pyplot as plt
 
 def divide_dataset_basic(path):
     '''
@@ -53,22 +54,23 @@ class CelebA(Dataset):
             mode: train/val modes
             crop: Crop sizes (default: 64)
     '''
-    def __init__(self, mode, cfg, crop_size=64):
+    def __init__(self, mode, cfg, crop_size=64, H=20):
         super(CelebA, self).__init__()
         self.mode = mode
         self.path = cfg['dataset']['path']
-
+        self.H = H
         self.crop_size = crop_size
         assert (mode in ['train', 'val']), 'mode in {} should be train/val'.format(self.__name__)
         self._get_files()
-        raise NotImplementedError
 
 
     def _get_files(self):
         # Get all image file paths from root path
         self.files = []
-        assert exists(join(self.path, self.mode)), \
-                'Path {} does not exist'.format(join(self.path, self.mode))
+        if not exists(join(self.path, self.mode)):
+            divide_dataset_basic(self.path)
+        # assert exists(join(self.path, self.mode)), \
+        #         'Path {} does not exist'.format(join(self.path, self.mode))
 
         for root, _, files in os.walk(join(self.path, self.mode)):
             self.files.extend(sorted(list(map(lambda x: join(root, x), files))))
@@ -80,26 +82,45 @@ class CelebA(Dataset):
         return len(self.files)
 
 
-    def _get_task_image(self, image, idx):
-        # Get the image corresponding to the task (removepixel, etc)
-        rng = np.random.RandomState(idx)
-        task_image = image + 0
-        raise NotImplementedError
-
-
     def __getitem__(self, idx):
         # Get the idx' valued item
         filename = self.files[idx]
-
         image = cv2.imread(filename)
         assert (image is not None), filename
+
         # Convert image to right format (Crop and scale)
         image = cv2.resize(image, (self.crop_size, self.crop_size))
         image = (image[:, :, ::-1]/255.0)*2 - 1
-        task_image = self._get_task_image(image, idx)
+   
+        # Get mask and random generator
+        rng = np.random.RandomState(idx)
+        mask = np.ones(image.shape)[:, :, :1]
+        x1, y1 = rng.randint(image.shape[0] - self.H, size=(2, ))
+        w, h = self.H, self.H
+
+        mask[y1:y1+h, x1:x1+w] = 0
+        observed = mask*image
 
         return {
             'image': torch.Tensor(image.transpose(2, 0, 1)),
-            'taskimage': torch.Tensor(task_image.transpose(2, 0, 1)),
+            'mask' : torch.Tensor(mask.transpose(2, 0, 1)),
+            'observed': torch.Tensor(observed.transpose(2, 0, 1)),
         }
 
+
+if __name__ == '__main__':
+    CFG = {
+        'dataset': {
+            'path': '/home/rohitrango/datasets/CelebA',
+        }
+    }
+    dataset = CelebA('train', CFG)
+    for i in range(len(dataset)):
+        data = dataset.__getitem__(i)
+        plt.subplot(1, 3, 1)
+        plt.imshow((data['image'].numpy().transpose(1, 2, 0) + 1)/2.0)
+        plt.subplot(1, 3, 2)
+        plt.imshow((data['mask'][0] + 1)/2.0, 'gray')
+        plt.subplot(1, 3, 3)
+        plt.imshow((data['observed'].numpy().transpose(1, 2, 0) + 1)/2.0)
+        plt.show()
