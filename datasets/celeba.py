@@ -58,7 +58,7 @@ class CelebA(Dataset):
         super(CelebA, self).__init__()
         self.mode = mode
         self.path = cfg['dataset']['path']
-        self.H = H
+        self.height = H
         self.crop_size = crop_size
         assert (mode in ['train', 'val']), 'mode in {} should be train/val'.format(self.__name__)
         self._get_files()
@@ -91,14 +91,14 @@ class CelebA(Dataset):
         # Convert image to right format (Crop and scale)
         image = cv2.resize(image, (self.crop_size, self.crop_size))
         image = (image[:, :, ::-1]/255.0)*2 - 1
-   
+
         # Get mask and random generator
         rng = np.random.RandomState(idx)
         mask = np.ones(image.shape)[:, :, :1]
-        x1, y1 = rng.randint(image.shape[0] - self.H, size=(2, ))
-        w, h = self.H, self.H
+        x_start, y_start = rng.randint(image.shape[0] - self.height, size=(2, ))
+        width, height = self.height, self.height
 
-        mask[y1:y1+h, x1:x1+w] = 0
+        mask[y_start:y_start+height, x_start:x_start+width] = 0
         observed = mask*image
 
         return {
