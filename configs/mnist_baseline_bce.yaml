@@ -5,22 +5,23 @@ DATASET:
 TRAIN:
   NUM-EPOCHS: 10000
   SAVE-FREQ: 2000
-  BATCH-SIZE: 1024
+  BATCH-SIZE: 1600
   SHUFFLE: True
   STEP-LOG: 5
 VAL:
   BATCH-SIZE: 256
+  NUM-SAMPLES: 10
   SHUFFLE: True
   SAVE-IMG: False
   LOSS-THRES: 0.2
 # Generator configuration
 MODEL:
   NAME: EncoderDecoderNetMini
-  LAST_LAYER: tanh
+  LAST_LAYER: sigmoid
   INP_CHANNELS: 1
   N_HIDDEN: 32
-  FC_HIDDEN: 50
-  FC_OUT: 16
+  FC_HIDDEN: 100
+  FC_OUT: 32
   OPTIMIZER: ADAM
   LR: 0.001
   BETA1: 0.9
@@ -30,8 +31,8 @@ MODEL:
   DECAY-FACTOR: 0.995
   WEIGHT-DECAY: 0.00001
   INIT: ORTHOGONAL
-  LOSS: MSE
-  LR-OVERRIDE: True
+  LOSS: BCE
+  LR-OVERRIDE: False
 REG:
   LAMBDA_KL: 1
   LAMBDA_REG: 1
@@ -40,7 +41,8 @@ REG:
   APPLY_REG: True
 
 USE-CUDA: True
-PRETRAINED: '/home/rohitrango/dbdata/saved_models/mnist-del-row/model_checkpoint_28000.pt'
-SAVE-PATH: '/home/rohitrango/dbdata/saved_models/mnist-del-row'
+PRETRAINED: 
+PRETRAINED: '/home/rohitrango/dbdata/saved_models/mnist-del-row-bce-big/model_checkpoint_50000.pt' 
+SAVE-PATH: '/home/rohitrango/dbdata/saved_models/mnist-del-row-bce-big'
 PEEK-VALIDATION: 500
 TYPE: PAIRED
