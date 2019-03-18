@@ -106,7 +106,7 @@ def train(cfg):
 
             # Log into the file after some epochs
             if ckpt % cfg['train']['step-log'] == 0:
-                lossesfile.write('Epoch: {}, step: {}, loss: {}'.format(
+                lossesfile.write('Epoch: {}, step: {}, loss: {}\n'.format(
                     epoch, ckpt, loss_val.data.cpu().numpy()
                 ))
 

@@ -71,10 +71,12 @@ class EncoderDecoderNetMini(nn.Module):
         elif last_layer == 'sigmoid':
             self.last_activation = F.sigmoid
         else:
+            print("Using no activation at final layer...")
             self.last_activation = None
 
+        # Proposal Net will take input channels + 1 for mask
         self.proposal_net = ProposalNetMini(
-            inp_channels=inp_channels,
+            inp_channels=inp_channels+1,
             n_hidden=n_hidden,
             fc_hidden=fc_hidden,
             fc_out=fc_out
@@ -85,7 +87,8 @@ class EncoderDecoderNetMini(nn.Module):
         self.inp_channels = inp_channels
         self.activation = activation
         # Get modules
-        self.in_conv = parts.InConv(inp_channels, n_hidden)
+        # In Conv gets inp_channels + 1 for mask
+        self.in_conv = parts.InConv(inp_channels + 1, n_hidden)
         self.resblock1 = parts.ResBlock(n_hidden, n_hidden) # 14 * 14
         self.resblock2 = parts.ResBlock(n_hidden, n_hidden) # 7 * 7
         self.maxpool1 = nn.MaxPool2d(2, stride=2)
@@ -102,8 +105,9 @@ class EncoderDecoderNetMini(nn.Module):
         self.out_resblock1 = parts.ResBlock(2 * n_hidden, n_hidden)
         self.out_resblock2 = parts.ResBlock(2 * n_hidden, n_hidden)
         self.upsample = nn.Upsample(scale_factor=2)
-        # Final output
-        self.out_conv = nn.Conv2d(n_hidden, inp_channels, 3, padding=1)
+        self.out_resblock3 = parts.ResBlock(n_hidden, n_hidden)
+        # Final output (will have inp_channels)
+        self.out_conv = nn.Conv2d(n_hidden, 2*inp_channels, 3, padding=1)
 
 
     def forward(self, image):
@@ -136,6 +140,7 @@ class EncoderDecoderNetMini(nn.Module):
         out = self.upsample(out)
         out = self.out_resblock2(out, out1)
         out = self.upsample(out)
+        out = self.out_resblock3(out)
         out = self.out_conv(out)
         if self.last_activation is not None:
             out = self.last_activation(out)
@@ -156,11 +161,16 @@ if __name__ == '__main__':
             'fc_hidden': 50,
             'fc_out': 16,
             'inp_channels':1,
+            'last_layer': 'tanh',
         }
     }
     network = EncoderDecoderNetMini(CFG)
-    inputs = torch.rand(8, 1, 28, 28)
+    inputs = {
+        'image': torch.rand(8, 1, 28, 28),
+        'mask': torch.rand(8, 1, 28, 28),
+        'observed': torch.rand(8, 1, 28, 28),
+    }
     outputs = network(inputs)
-    print 'inputs', inputs.shape
+    print 'inputs', inputs
     for key, value in outputs.items():
         print key, value.shape
