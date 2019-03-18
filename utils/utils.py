@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 from torch.optim import Adam, SGD
 from torch.optim import lr_scheduler
 from skimage import io
+import numpy as np
 
 from datasets.celeba import CelebA
 from datasets.mnist import MNISTRowDeleted
@@ -205,9 +206,41 @@ def save_images(data, outs, cfg, save_index, suffix=''):
     '''
     if cfg['dataset']['name'] == 'mnist':
         io.imsave('{}/{}_img_{}.png'.format(cfg['save-path'], save_index, suffix), \
-            data['image'][0, 0].data.cpu().numpy())
+            data['image'][0, 1].data.cpu().numpy())
         io.imsave('{}/{}_obs_{}.png'.format(cfg['save-path'], save_index, suffix), \
-            data['observed'][0, 0].data.cpu().numpy())
+            data['observed'][0, 1].data.cpu().numpy())
         io.imsave('{}/{}_out_{}.png'.format(cfg['save-path'], save_index, suffix), \
-            outs['out'][0, 0].data.cpu().numpy())
+            outs['out'][0, 1].data.cpu().numpy())
         print "Saved for ckpt: {} {}".format(save_index, suffix)
+    else:
+        raise NotImplementedError
+
+
+def save_val_images(data, outs, cfg, save_index, suffix='val'):
+    '''
+    Save images from validation for results
+    The image is the same repeated N times for N samples
+    '''
+    N, C, H, W = outs['out'].shape
+    if cfg['dataset']['name'] == 'mnist':
+        out_img = np.zeros((H, W*(N + 2)))
+        out_img[:, :W] = data['observed'][0, 0].data.cpu().numpy()
+        for i in range(N):
+            out_img[:, (i+1)*W:(i+2)*W] = outs['out'][i, 1].data.cpu().numpy()
+        out_img[:, -W:] = data['image'][0, 0].data.cpu().numpy()
+        # Save it
+        io.imsave('{}/{}_val_out_{}.png'.format(cfg['save-path'], save_index, suffix),\
+            out_img)
+        print "Saved for ckpt: {} {}".format(save_index, suffix)
+    else:
+        raise NotImplementedError
+
+
+def repeat_data(data, cfg):
+    '''
+    Repeat data along the batch axis to get more samples
+    '''
+    samples = cfg['val']['num-samples']
+    for key, value in data.items():
+        data[key] = data[key].repeat(samples, 1, 1, 1)
+    return data

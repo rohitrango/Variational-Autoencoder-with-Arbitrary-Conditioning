@@ -16,9 +16,64 @@ def validate(cfg):
     Main loop for validation, load the dataset, model, and
     other things. Run validation on the validation set
     '''
-    cfg = cfg * 2
-    raise NotImplementedError
-    # print json.dumps(cfg, sort_keys=True, indent=4)
+    print json.dumps(cfg, sort_keys=True, indent=4)
+
+    use_cuda = cfg['use-cuda']
+    cfg['val']['batch-size'] = 1
+    _, _, _, val_dl = utils.get_data_loaders(cfg)
+
+    model = utils.get_model(cfg)
+    if use_cuda:
+        model = model.cuda()
+    model = utils.init_weights(model, cfg)
+
+    # Get pretrained models, optimizers and loss functions
+    optim = utils.get_optimizers(model, cfg)
+    model, _, metadata = utils.load_ckpt(model, optim, cfg)
+    loss_fn = utils.get_losses(cfg)
+
+    # Set up random seeds
+    seed = np.random.randint(2**32)
+    ckpt = 0
+    if metadata is not None:
+        seed = metadata['seed']
+        ckpt = metadata['ckpt']
+    seed = 42
+
+    # Random seed according to what the saved model is
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+    # Run test loop
+    with torch.no_grad():
+        # Run the main training loop
+        for idx, data in enumerate(val_dl):
+            # zero out the grads
+            optim.zero_grad()
+
+            # Change to required device
+            for key, value in data.items():
+                data[key] = Variable(value)
+                if use_cuda:
+                    data[key] = data[key].cuda()
+
+            data = utils.repeat_data(data, cfg)
+
+            # Get all outputs
+            outputs = model(data)
+            loss_val = loss_fn(outputs, data, cfg)
+
+            # print it
+            print('Step: {}, loss: {}'.format(
+                idx, loss_val.data.cpu().numpy()
+            ))
+
+            print(outputs['out'].shape)
+            utils.save_val_images(data, outputs, cfg, idx)
+            if idx == 40:
+                break
 
     # print("""
     #     Summary:
