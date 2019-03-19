@@ -1,0 +1,6 @@
+opencv-contrib-python==3.4.2.17
+scipy>=0.17.0
+numpy==1.14.5
+torch==0.4.1
+torchvision==0.2.1
+scikit-image==0.14.2
