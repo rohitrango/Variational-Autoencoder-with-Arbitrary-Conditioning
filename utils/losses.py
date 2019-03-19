@@ -9,17 +9,17 @@ class MSERecon(nn.Module):
     '''
     Loss function with Gaussian log-likelihood
     '''
-    def forward(self, outputs, inputs, cfg):
+    def forward(self, outputs, inputs, cfg, val=False):
         # There will be 3 terms,
         # first term: reconstruction loss
         # second term: KL divergence
         # third term: regularizer (optional)
         channels = cfg['model']['inp_channels']
 
-        mask = 1 - inputs['mask']
+        mask = (1 - inputs['mask'])
         recon_loss = mask*((outputs['out'][:, :channels] - inputs['image'])**2)
         recon_loss = (recon_loss + ((outputs['out'][:, channels:] - inputs['image'])**2))
-        recon_loss = recon_loss.mean()/2.0
+        recon_loss = recon_loss.mean()/2.0/mask.mean()
         # 2nd term
         mu1, logs1 = outputs['prop_mean'], outputs['prop_logs']
         mu2, logs2 = outputs['mean'], outputs['logs']
@@ -35,8 +35,13 @@ class MSERecon(nn.Module):
             loss_reg = mu2**2 / (2 * cfg_reg['sigma_m']**2) - cfg_reg['sigma_s']*(logs2 - sigma2)
             loss_reg = loss_reg.mean()
 
-        # print(float(recon_loss), float(kl_div), float(loss_reg))
-        loss_val = recon_loss + cfg_reg['lambda_kl']*kl_div + cfg_reg['lambda_reg']*loss_reg
+        # If not validation, use the 3-termed loss,
+        # else, just use the MSE between generated and ground truth
+        if not val:
+            loss_val = recon_loss + cfg_reg['lambda_kl']*kl_div + cfg_reg['lambda_reg']*loss_reg
+        else:
+            loss_val = ((outputs['out'][:, channels:] - inputs['image'])**2).mean()
+
         return loss_val
 
 
@@ -44,7 +49,7 @@ class BCERecon(nn.Module):
     '''
     Similar to MSERecon but with Bernoulli loglikelihood
     '''
-    def forward(self, outputs, inputs, cfg=None):
+    def forward(self, outputs, inputs, cfg=None, val=False):
         # There will be 3 terms,
         # first term: reconstruction loss
         # second term: KL divergence
@@ -53,11 +58,15 @@ class BCERecon(nn.Module):
         mask = 1 - inputs['mask']
         # Get recon loss
         image = (inputs['image'] + 1.0)/2
+        image[image > 0.5] = 1
+        image[image <= 0.5] = 0
         # print(image.shape)
         # print(outputs['out'].shape)
 
         # First part is for x_b, second is for y
-        recon_loss = mask*( -image*torch.log(outputs['out'][:, :channels]) \
+        # First part (unobserved) will consist of first 'C' channels
+        # Second part (entire image) will consist of next 'C' channels
+        recon_loss = mask*(-image*torch.log(outputs['out'][:, :channels]) \
                      -(1 - image)*torch.log(1 - outputs['out'][:, :channels]))
         recon_loss = recon_loss + (-image*torch.log(outputs['out'][:, channels:])\
                      -(1 - image)*torch.log(1 - outputs['out'][:, channels:]))
@@ -78,5 +87,9 @@ class BCERecon(nn.Module):
             loss_reg = loss_reg.mean()
 
         # print(float(recon_loss), float(kl_div), float(loss_reg))
-        loss_val = recon_loss + cfg_reg['lambda_kl']*kl_div + cfg_reg['lambda_reg']*loss_reg
+        if not val:
+            loss_val = recon_loss + cfg_reg['lambda_kl']*kl_div + cfg_reg['lambda_reg']*loss_reg
+        else:
+            loss_val = recon_loss
+
         return loss_val

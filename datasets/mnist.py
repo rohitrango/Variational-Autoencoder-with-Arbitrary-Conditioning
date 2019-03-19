@@ -43,9 +43,9 @@ class MNISTRowDeleted(Dataset):
         observed = (mask*image).float()
 
         # Return
-        # image < [-1, 1]
-        # mask < [0, 1]
-        # observed < [-1, 1]
+        # image in [-1, 1]
+        # mask in [0, 1]
+        # observed in [-1, 1]
         return {
             'image'     : torch.Tensor(image),
             'mask'      : torch.Tensor(mask),

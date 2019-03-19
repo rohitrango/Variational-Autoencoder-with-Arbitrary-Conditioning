@@ -12,16 +12,21 @@ from torch.utils.data import Dataset
 import numpy as np
 from matplotlib import pyplot as plt
 
-def divide_dataset_basic(path):
+def divide_dataset_basic(path, fraction=0.85):
     '''
+    Helper function for dividing the CelebA dataset into train or test sets
+    
     Check if path exists or not
-    and then create subsets
+    and then create subsets accordingly
+
+    The paper creates a 85-15 % split. I use the same split here
+    Change the `fraction` if you want to change the split
     '''
     if exists(join(path, 'train')):
         print 'Path {} exists'.format(path)
         return
 
-    # Divide into train, val and test
+    # Divide into train and val
     all_files = None
     for root, _, all_files in os.walk(join(path, 'img_align_celeba')):
         all_files = map(lambda x: join(root, x), all_files)
@@ -30,7 +35,7 @@ def divide_dataset_basic(path):
 
     # Divide the dataset
     # They report only validation scores, which is 15% of the dataset
-    divide = int(len(all_files)*0.85)
+    divide = int(len(all_files)*fraction)
     mode = {
         'train' : all_files[:divide],
         'val'   : all_files[divide:],
@@ -52,25 +57,26 @@ class CelebA(Dataset):
     Generalized dataset for CelebA
     Inputs: path: path to files
             mode: train/val modes
+            cfg : config file
             crop: Crop sizes (default: 64)
     '''
-    def __init__(self, mode, cfg, crop_size=64, H=20):
+    def __init__(self, mode, cfg, crop_size=64):
         super(CelebA, self).__init__()
         self.mode = mode
         self.path = cfg['dataset']['path']
-        self.height = H
+        self.height = cfg['dataset']['h']
+        self.type = cfg['dataset'].get('type', None)
+        self.P = cfg['dataset'].get('p', 1)
         self.crop_size = crop_size
         assert (mode in ['train', 'val']), 'mode in {} should be train/val'.format(self.__name__)
         self._get_files()
 
 
     def _get_files(self):
-        # Get all image file paths from root path
+        # Get all image file paths from root path and store in a list
         self.files = []
         if not exists(join(self.path, self.mode)):
             divide_dataset_basic(self.path)
-        # assert exists(join(self.path, self.mode)), \
-        #         'Path {} does not exist'.format(join(self.path, self.mode))
 
         for root, _, files in os.walk(join(self.path, self.mode)):
             self.files.extend(sorted(list(map(lambda x: join(root, x), files))))
@@ -82,8 +88,35 @@ class CelebA(Dataset):
         return len(self.files)
 
 
+    def _get_mask(self, idx, image):
+        # Get mask given in the config
+        rng = np.random.RandomState(idx)
+        # Check type
+        if self.type is None:
+            mask = np.ones(image.shape)[:, :, :1]
+            x_start, y_start = rng.randint(image.shape[0] - self.height, size=(2, ))
+            width, height = self.height, self.height
+            mask[y_start:y_start+height, x_start:x_start+width] = 0
+        # Center mask, create a mask of height H * H from center
+        elif self.type == 'center':
+            mask = np.ones(image.shape)[:, :, :1]
+            c_y, c_x = image.shape[0]//2, image.shape[1]//2
+            mask[c_y - self.height//2 : c_y + self.height//2, \
+                 c_x - self.height//2 : c_x + self.height//2] = 0
+        # Random mask, drop pixels randomly
+        elif self.type == 'random':
+            mask = np.random.rand(*image.shape)[:, :, :1]
+            mask = (mask < self.P).astype(float)
+        # rest are not implemented for now
+        else:
+            raise NotImplementedError
+        return mask
+
+
     def __getitem__(self, idx):
         # Get the idx' valued item
+        # First fetch the image, then get the mask
+        # Return the final image
         filename = self.files[idx]
         image = cv2.imread(filename)
         assert (image is not None), filename
@@ -92,13 +125,7 @@ class CelebA(Dataset):
         image = cv2.resize(image, (self.crop_size, self.crop_size))
         image = (image[:, :, ::-1]/255.0)*2 - 1
 
-        # Get mask and random generator
-        rng = np.random.RandomState(idx)
-        mask = np.ones(image.shape)[:, :, :1]
-        x_start, y_start = rng.randint(image.shape[0] - self.height, size=(2, ))
-        width, height = self.height, self.height
-
-        mask[y_start:y_start+height, x_start:x_start+width] = 0
+        mask = self._get_mask(idx, image)
         observed = mask*image
 
         return {
@@ -106,6 +133,7 @@ class CelebA(Dataset):
             'mask' : torch.Tensor(mask.transpose(2, 0, 1)),
             'observed': torch.Tensor(observed.transpose(2, 0, 1)),
         }
+
 
 
 if __name__ == '__main__':

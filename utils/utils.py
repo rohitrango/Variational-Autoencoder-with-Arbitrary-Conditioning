@@ -16,7 +16,7 @@ import numpy as np
 from datasets.celeba import CelebA
 from datasets.mnist import MNISTRowDeleted
 
-from networks import mnist_vaeac
+from networks import mnist_vaeac, celeba_vaeac
 from losses import MSERecon, BCERecon
 
 # Dictionary of loss functions
@@ -53,6 +53,8 @@ def get_model(cfg):
     '''
     if cfg['model']['name'] == 'EncoderDecoderNetMini'.lower():
         model = mnist_vaeac.EncoderDecoderNetMini(cfg)
+    elif cfg['model']['name'] == 'EncoderDecoderNet'.lower():
+        model = celeba_vaeac.EncoderDecoder(cfg)
     else:
         raise NotImplementedError
     return model
@@ -204,14 +206,24 @@ def save_images(data, outs, cfg, save_index, suffix=''):
     '''
     Save black-and-white or colored images
     '''
-    if cfg['dataset']['name'] == 'mnist':
+    if cfg['model']['inp_channels'] == 1:
         io.imsave('{}/{}_img_{}.png'.format(cfg['save-path'], save_index, suffix), \
-            data['image'][0, 1].data.cpu().numpy())
+            data['image'][0, 0].data.cpu().numpy())
         io.imsave('{}/{}_obs_{}.png'.format(cfg['save-path'], save_index, suffix), \
-            data['observed'][0, 1].data.cpu().numpy())
+            data['observed'][0, 0].data.cpu().numpy())
         io.imsave('{}/{}_out_{}.png'.format(cfg['save-path'], save_index, suffix), \
             outs['out'][0, 1].data.cpu().numpy())
         print "Saved for ckpt: {} {}".format(save_index, suffix)
+
+    elif cfg['model']['inp_channels'] == 3:
+        io.imsave('{}/{}_img_{}.png'.format(cfg['save-path'], save_index, suffix), \
+            re_normalize(data['image'][0].data.cpu().numpy().transpose(1, 2, 0), cfg))
+        io.imsave('{}/{}_obs_{}.png'.format(cfg['save-path'], save_index, suffix), \
+            re_normalize(data['observed'][0].data.cpu().numpy().transpose(1, 2, 0), cfg))
+        io.imsave('{}/{}_out_{}.png'.format(cfg['save-path'], save_index, suffix), \
+            re_normalize(outs['out'][0].data.cpu().numpy().transpose(1, 2, 0)[:, :, :3], cfg))
+        print "Saved for ckpt: {} {}".format(save_index, suffix)
+
     else:
         raise NotImplementedError
 
@@ -222,7 +234,7 @@ def save_val_images(data, outs, cfg, save_index, suffix='val'):
     The image is the same repeated N times for N samples
     '''
     N, C, H, W = outs['out'].shape
-    if cfg['dataset']['name'] == 'mnist':
+    if cfg['model']['inp_channels'] == 1:
         out_img = np.zeros((H, W*(N + 2)))
         out_img[:, :W] = data['observed'][0, 0].data.cpu().numpy()
         for i in range(N):
@@ -231,6 +243,17 @@ def save_val_images(data, outs, cfg, save_index, suffix='val'):
         # Save it
         io.imsave('{}/{}_val_out_{}.png'.format(cfg['save-path'], save_index, suffix),\
             out_img)
+        print "Saved for ckpt: {} {}".format(save_index, suffix)
+    # Treat colored images a little differently
+    elif cfg['model']['inp_channels'] == 3:
+        out_img = np.zeros((H, W*(N + 2), 3))
+        out_img[:, :W] = data['observed'][0].data.cpu().numpy().transpose(1, 2, 0)
+        for i in range(N):
+            out_img[:, (i+1)*W:(i+2)*W] = outs['out'][i, :3].data.cpu().numpy().transpose(1, 2, 0)
+        out_img[:, -W:] = data['image'][0].data.cpu().numpy().transpose(1, 2, 0)
+        # Save it
+        io.imsave('{}/{}_val_out_{}.png'.format(cfg['save-path'], save_index, suffix),\
+            (out_img + 1.0)/2.0)
         print "Saved for ckpt: {} {}".format(save_index, suffix)
     else:
         raise NotImplementedError

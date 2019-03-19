@@ -8,7 +8,7 @@ from torch import nn
 
 class ResBlock(nn.Module):
     '''
-    Residual block with or without downsampling
+    Residual block without downsampling
     '''
     def __init__(self,
                  in_ch,
@@ -49,7 +49,7 @@ class ResBlock(nn.Module):
 
 class InConv(nn.Module):
     '''
-    Just the initial layers
+    Just the initial layers from an image to features
     '''
     def __init__(self,
                  in_ch,
