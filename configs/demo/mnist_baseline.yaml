@@ -1,0 +1,47 @@
+DATASET:
+  NAME: mnist
+  PATH: '/home/rohitrango/datasets/MNIST/'
+  H: 3
+TRAIN:
+  NUM-EPOCHS: 10000
+  SAVE-FREQ: 2000
+  BATCH-SIZE: 1024
+  SHUFFLE: True
+  STEP-LOG: 5
+VAL:
+  BATCH-SIZE: 256
+  SHUFFLE: True
+  SAVE-IMG: False
+  LOSS-THRES: 0.2
+# Generator configuration
+MODEL:
+  NAME: EncoderDecoderNetMini
+  LAST_LAYER: tanh
+  INP_CHANNELS: 1
+  N_HIDDEN: 32
+  FC_HIDDEN: 50
+  FC_OUT: 16
+  OPTIMIZER: ADAM
+  LR: 0.0001
+  BETA1: 0.9
+  BETA2: 0.999
+  SCHEDULER: STEP
+  DECAY-STEPS: 500
+  DECAY-FACTOR: 0.995
+  WEIGHT-DECAY: 0.00001
+  INIT: ORTHOGONAL
+  LOSS: MSE
+  LR-OVERRIDE: True
+REG:
+  LAMBDA_KL: 1
+  LAMBDA_REG: 1
+  SIGMA_M: 10000
+  SIGMA_S: 0.0001
+  APPLY_REG: True
+
+USE-CUDA: True
+PRETRAINED:
+#PRETRAINED: '/home/rohitrango/dbdata/saved_models/mnist-del-row/model_checkpoint_28000.pt'
+SAVE-PATH: '/home/rohitrango/dbdata/saved_models/mnist-del-row'
+PEEK-VALIDATION: 500
+TYPE: PAIRED

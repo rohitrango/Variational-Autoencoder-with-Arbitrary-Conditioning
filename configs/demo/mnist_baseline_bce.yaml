@@ -13,7 +13,6 @@ VAL:
   NUM-SAMPLES: 10
   SHUFFLE: True
   SAVE-IMG: False
-  LOSS-THRES: 0.2
 # Generator configuration
 MODEL:
   NAME: EncoderDecoderNetMini
@@ -42,7 +41,7 @@ REG:
 
 USE-CUDA: True
 PRETRAINED: 
-PRETRAINED: '/home/rohitrango/dbdata/saved_models/mnist-del-row-bce-big/model_checkpoint_50000.pt' 
+PRETRAINED: '/home/rohitrango/dbdata/saved_models/mnist-del-row-bce-big/model_checkpoint_120000.pt' 
 SAVE-PATH: '/home/rohitrango/dbdata/saved_models/mnist-del-row-bce-big'
-PEEK-VALIDATION: 500
+PEEK-VALIDATION: 1000
 TYPE: PAIRED

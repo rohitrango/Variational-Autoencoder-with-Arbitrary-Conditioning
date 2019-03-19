@@ -1,26 +1,29 @@
 DATASET:
-  NAME: mnist
-  PATH: '/home/rohitrango/datasets/MNIST/'
-  H: 3
+  NAME: celeba_randommask
+  PATH: '/home/rohitrango/datasets/CelebA/'
+  MIN: -1
+  MAX: 1
+  H: 20
+  P: 0.1
 TRAIN:
   NUM-EPOCHS: 10000
   SAVE-FREQ: 2000
-  BATCH-SIZE: 1024
+  BATCH-SIZE: 128
   SHUFFLE: True
   STEP-LOG: 5
 VAL:
-  BATCH-SIZE: 256
+  BATCH-SIZE: 2000
+  NUM-SAMPLES: 1
   SHUFFLE: True
   SAVE-IMG: False
-  LOSS-THRES: 0.2
-# Generator configuration
+# modek configuration
 MODEL:
-  NAME: EncoderDecoderNetMini
+  NAME: EncoderDecoderNet
   LAST_LAYER: tanh
-  INP_CHANNELS: 1
+  INP_CHANNELS: 3
   N_HIDDEN: 32
-  FC_HIDDEN: 50
-  FC_OUT: 16
+  FC_HIDDEN: 100
+  FC_OUT: 50
   OPTIMIZER: ADAM
   LR: 0.001
   BETA1: 0.9
@@ -40,7 +43,7 @@ REG:
   APPLY_REG: True
 
 USE-CUDA: True
-PRETRAINED: '/home/rohitrango/dbdata/saved_models/mnist-del-row/model_checkpoint_28000.pt'
-SAVE-PATH: '/home/rohitrango/dbdata/saved_models/mnist-del-row'
-PEEK-VALIDATION: 500
-TYPE: PAIRED
+PRETRAINED:
+PRETRAINED: '/home/rohitrango/dbdata/saved_models/celeba-mse-rand/model_checkpoint_56000.pt'
+SAVE-PATH: '/home/rohitrango/dbdata/saved_models/celeba-mse-rand'
+PEEK-VALIDATION: 200

@@ -1,0 +1,46 @@
+DATASET:
+  NAME: celeba
+  PATH: '/home/rohitrango/datasets/CelebA/'
+  MIN: -1
+  MAX: 1
+  H: 20
+TRAIN:
+  NUM-EPOCHS: 10000
+  SAVE-FREQ: 2000
+  BATCH-SIZE: 128
+  SHUFFLE: True
+  STEP-LOG: 5
+VAL:
+  BATCH-SIZE: 1
+  NUM-SAMPLES: 6
+  SHUFFLE: True
+  SAVE-IMG: True
+# model configuration
+MODEL:
+  NAME: EncoderDecoderNet
+  LAST_LAYER: tanh
+  INP_CHANNELS: 3
+  N_HIDDEN: 32
+  FC_HIDDEN: 100
+  FC_OUT: 50
+  OPTIMIZER: ADAM
+  LR: 0.001
+  BETA1: 0.9
+  BETA2: 0.999
+  SCHEDULER: STEP
+  DECAY-STEPS: 500
+  DECAY-FACTOR: 0.995
+  WEIGHT-DECAY: 0.00001
+  INIT: ORTHOGONAL
+  LOSS: MSE
+  LR-OVERRIDE: True
+REG:
+  LAMBDA_KL: 1
+  LAMBDA_REG: 1
+  SIGMA_M: 10000
+  SIGMA_S: 0.0001
+  APPLY_REG: True
+USE-CUDA: True
+PRETRAINED: '/home/rohitrango/dbdata/saved_models/celeba-mse/model_checkpoint_70000.pt'
+SAVE-PATH: '/home/rohitrango/dbdata/saved_models/celeba-mse'
+PEEK-VALIDATION: 200
