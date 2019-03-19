@@ -1,7 +1,7 @@
 # Variational Autoencoder with Arbitrary Conditioning
 
 ## Introduction
-This is a PyTorch implementation of the ICLR 2019 paper `Variational Autoencoder with Arbitrary Conditioning'.
+This is a PyTorch implementation of the ICLR 2019 paper [Variational Autoencoder with Arbitrary Conditioning](https://openreview.net/forum?id=SyxtJh0qYm). The idea of the paper is to extend the notion of Conditional Variational Autoencoders to enable arbitrary conditioning, i.e. a different subset of features is used to generate samples from the distribution <a href="https://www.codecogs.com/eqnedit.php?latex=p(x_b&space;|&space;x_{1-b},&space;b)" target="_blank"><img src="https://latex.codecogs.com/gif.latex?p(x_b&space;|&space;x_{1-b},&space;b)" title="p(x_b |x_{1-b}, b)" /></a> where <a href="https://www.codecogs.com/eqnedit.php?latex=x_{1-b}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?x_{1-b}" title="x_{1-b}" /></a> is a random subset of observed features and _b_ is a binary mask indicating if a feature is observed or not. The authors postulate that this can be effective especially for imputation and inpainting tasks where only a certain portion of the image is visible.
 
 
 ## Installation
@@ -52,15 +52,16 @@ The structure of configuration files is inspired from the [Detectron](https://gi
 ## Quantitative Results
 
 ### MNIST
-The only metric the paper supplied was the negative log-likelihood. Although the log-likelihood doesn't make much sense since there can be many probable images with the same value of observed image, and hence a single solution may not be the image corresponding to the ground truth but may still be feasible.
+The only metric the paper supplied for MNIST was the negative log-likelihood. Although the log-likelihood doesn't make much sense since there can be many probable images with the same value of observed image, and hence a single solution may not be the image corresponding to the ground truth but may still be feasible. However, the metric is still well-behaved.
 
 |		| Negative log-likelihood | 
 |-------|-------------------------|
 |MNIST	| 0.18557				  |
 
-The results are a little more meaningful for the image imputation tasks since the probability space of feasible images is now restricted given the image and mask. These are some of the baseline tasks to check sanity of the code and method. 
+The results are a little more meaningful for the image imputation tasks since the probability space of feasible images is now restricted given the image and mask. These are some of the baseline tasks to check sanity of the code and method. The paper measures PSNR scores between their and other methods. Note that these numbers are just some baselines used to perform a sanity check.
 
-|		 | Random mask (p = 0.9)	 | Square mask (W = 20)  |
+
+| PSNR   | Random mask (p = 0.9)	 | Square mask (W = 20)  |
 |--------|---------------------------|-----------------------|
 | CelebA | 		22.1513				 | 		28.7348			 |	  
 
