@@ -3,9 +3,8 @@ DATASET:
   PATH: '/home/rohitrango/datasets/CelebA/'
   MIN: -1
   MAX: 1
-  H: 20
-  P: 0.1
-  TYPE: RANDOM
+  H: 32
+  TYPE: CENTER
 TRAIN:
   NUM-EPOCHS: 10000
   SAVE-FREQ: 2000
@@ -13,10 +12,10 @@ TRAIN:
   SHUFFLE: True
   STEP-LOG: 5
 VAL:
-  BATCH-SIZE: 2000
-  NUM-SAMPLES: 1
+  BATCH-SIZE: 1
+  NUM-SAMPLES: 6
   SHUFFLE: True
-  SAVE-IMG: False
+  SAVE-IMG: True
 # model configuration
 MODEL:
   NAME: EncoderDecoderNet
@@ -42,9 +41,8 @@ REG:
   SIGMA_M: 10000
   SIGMA_S: 0.0001
   APPLY_REG: True
-
 USE-CUDA: True
 PRETRAINED:
-PRETRAINED: '/home/rohitrango/dbdata/saved_models/celeba-mse-rand/model_checkpoint_56000.pt'
-SAVE-PATH: '/home/rohitrango/dbdata/saved_models/celeba-mse-rand'
+# PRETRAINED: '/home/rohitrango/dbdata/saved_models/celeba-mse/model_checkpoint_70000.pt'
+SAVE-PATH: '/home/rohitrango/dbdata/saved_models/celeba-center-crop'
 PEEK-VALIDATION: 200
