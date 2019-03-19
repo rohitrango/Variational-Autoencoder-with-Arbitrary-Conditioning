@@ -5,7 +5,7 @@ This is a PyTorch implementation of the ICLR 2019 paper `Variational Autoencoder
 
 
 ## Qualitative Results
-Here are some qualitative results on MNIST.
+Here are some qualitative results on MNIST. The first image is the input to VAEAC. The other images are the samples drawn from the network. The last image is the ground truth. Note that given the partially observed input, the network successfully learns to output feasible outputs. The conditioning is arbitrary because each instance has a different subset of pixels which is observed. 
 
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/0.png)
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/1.png)
@@ -18,18 +18,18 @@ Here are some qualitative results on MNIST.
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/8.png)
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/9.png)
 
-Here are some results on CelebA dataset with only 10% pixels retained.
+Here are some results on CelebA dataset with only 10% pixels retained in the input.
 
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/0.png)
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/1.png)
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/2.png)
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/3.png)
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/4.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/5.png)
+<!-- ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/5.png)
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/6.png)
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/7.png)
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/8.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/9.png)
+![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/9.png) -->
 
 ## Quantitative Results
 
