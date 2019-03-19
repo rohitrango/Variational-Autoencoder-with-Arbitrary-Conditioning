@@ -18,6 +18,18 @@ Here are some qualitative results on MNIST.
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/8.png)
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/9.png)
 
+Here are some results on CelebA dataset with only 10% pixels retained.
+
+![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/0.png)
+![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/1.png)
+![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/2.png)
+![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/3.png)
+![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/4.png)
+![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/5.png)
+![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/6.png)
+![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/7.png)
+![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/8.png)
+![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/9.png)
 
 ## Quantitative Results
 
