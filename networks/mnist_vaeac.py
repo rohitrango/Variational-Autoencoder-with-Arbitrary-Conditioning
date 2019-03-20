@@ -131,6 +131,7 @@ class EncoderDecoderNetMini(nn.Module):
         mean = self.fc_mean(out)
         logs = self.fc_sigma(out)
         sample = mean + torch.exp(logs)*torch.randn(mean.shape).to(mean.device)
+
         # Decoder net
         out = self.activation(self.out_fc1(sample))
         out = self.activation(self.out_fc2(out))

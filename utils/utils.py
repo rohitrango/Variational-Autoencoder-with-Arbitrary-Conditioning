@@ -212,7 +212,7 @@ def save_images(data, outs, cfg, save_index, suffix=''):
         io.imsave('{}/{}_obs_{}.png'.format(cfg['save-path'], save_index, suffix), \
             data['observed'][0, 0].data.cpu().numpy())
         io.imsave('{}/{}_out_{}.png'.format(cfg['save-path'], save_index, suffix), \
-            outs['out'][0, 1].data.cpu().numpy())
+            outs['out'][0, 0].data.cpu().numpy())
         print "Saved for ckpt: {} {}".format(save_index, suffix)
 
     elif cfg['model']['inp_channels'] == 3:
@@ -238,7 +238,7 @@ def save_val_images(data, outs, cfg, save_index, suffix='val'):
         out_img = np.zeros((H, W*(N + 2)))
         out_img[:, :W] = data['observed'][0, 0].data.cpu().numpy()
         for i in range(N):
-            out_img[:, (i+1)*W:(i+2)*W] = outs['out'][i, 1].data.cpu().numpy()
+            out_img[:, (i+1)*W:(i+2)*W] = outs['out'][i, 0].data.cpu().numpy()
         out_img[:, -W:] = data['image'][0, 0].data.cpu().numpy()
         # Save it
         io.imsave('{}/{}_val_out_{}.png'.format(cfg['save-path'], save_index, suffix),\

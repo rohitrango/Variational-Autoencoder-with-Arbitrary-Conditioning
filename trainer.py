@@ -58,7 +58,7 @@ def validate(cfg):
         data = utils.repeat_data(data, cfg)
 
         # Get all outputs
-        outputs = model(data, val=True)
+        outputs = model(data)
         loss_val = loss_fn(outputs, data, cfg, val=True)
         losses_list.append(float(loss_val))
         # print it
@@ -84,6 +84,9 @@ def validate(cfg):
         np.percentile(losses_list, 50),
         np.percentile(losses_list, 75),
     ))
+
+    print("PSNR: {}".format(10*np.log10(4/np.mean(losses_list))))
+
 
 
 def train(cfg):

@@ -4,6 +4,7 @@ Author: Rohit Jena
 '''
 import torch
 import torch.nn as nn
+from torch.nn import functional as F
 
 class MSERecon(nn.Module):
     '''
@@ -37,6 +38,7 @@ class MSERecon(nn.Module):
 
         # If not validation, use the 3-termed loss,
         # else, just use the MSE between generated and ground truth
+        # print(float(recon_loss), float(kl_div), float(loss_reg))
         if not val:
             loss_val = recon_loss + cfg_reg['lambda_kl']*kl_div + cfg_reg['lambda_reg']*loss_reg
         else:
@@ -49,7 +51,7 @@ class BCERecon(nn.Module):
     '''
     Similar to MSERecon but with Bernoulli loglikelihood
     '''
-    def forward(self, outputs, inputs, cfg=None, val=False):
+    def forward(self, outputs, inputs, cfg=None, val=False, eps=1e-10):
         # There will be 3 terms,
         # first term: reconstruction loss
         # second term: KL divergence
@@ -66,11 +68,15 @@ class BCERecon(nn.Module):
         # First part is for x_b, second is for y
         # First part (unobserved) will consist of first 'C' channels
         # Second part (entire image) will consist of next 'C' channels
-        recon_loss = mask*(-image*torch.log(outputs['out'][:, :channels]) \
-                     -(1 - image)*torch.log(1 - outputs['out'][:, :channels]))
-        recon_loss = recon_loss + (-image*torch.log(outputs['out'][:, channels:])\
-                     -(1 - image)*torch.log(1 - outputs['out'][:, channels:]))
-        recon_loss = recon_loss.mean()/2.0
+        # print(outputs['out'][:, :channels].max(), outputs['out'][:, :channels].min())
+        # print(outputs['out'][:, channels:].max(), outputs['out'][:, channels:].min())
+
+        recon_loss = F.binary_cross_entropy(outputs['out'][:, :channels] + eps, image, weight=mask)
+        # recon_loss = mask*(-image*torch.log(eps + outputs['out'][:, :channels]) \
+        #              -(1 - image)*torch.log(1 + eps - outputs['out'][:, :channels]))
+        # recon_loss = recon_loss + (-image*torch.log(eps + outputs['out'][:, channels:])\
+        #              -(1 - image)*torch.log(1 + eps - outputs['out'][:, channels:]))
+        recon_loss = recon_loss.mean()
         # 2nd term
         mu1, logs1 = outputs['prop_mean'], outputs['prop_logs']
         mu2, logs2 = outputs['mean'], outputs['logs']

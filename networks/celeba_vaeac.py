@@ -28,10 +28,12 @@ class ProposalNet(nn.Module):
         self.in_conv = parts.InConv(inp_channels, n_hidden)
         self.resblock1 = parts.ResBlock(n_hidden, n_hidden)
         self.resblock2 = parts.ResBlock(n_hidden, n_hidden)
-        self.maxpool1 = nn.MaxPool2d(2, stride=2)
-        self.maxpool2 = nn.MaxPool2d(2, stride=2)
+        self.resblock3 = parts.ResBlock(n_hidden, n_hidden)
+        self.resblock4 = parts.ResBlock(n_hidden, n_hidden)
+        self.resblock5 = parts.ResBlock(n_hidden, n_hidden)
+        self.maxpool = nn.MaxPool2d(2, stride=2)
         # fc layers
-        self.fc1 = nn.Linear(n_hidden * 16 * 16, fc_hidden)
+        self.fc1 = nn.Linear(n_hidden * CHAN * CHAN, fc_hidden)
         self.fc_mean = nn.Linear(fc_hidden, fc_out)
         self.fc_sigma = nn.Linear(fc_hidden, fc_out)
 
@@ -40,9 +42,13 @@ class ProposalNet(nn.Module):
         out = outx
         out = self.in_conv(out)
         out = self.resblock1(out)
-        out = self.maxpool1(out)
         out = self.resblock2(out)
-        out = self.maxpool2(out)
+        out = self.resblock3(out)
+        out = self.maxpool(out)
+        out = self.resblock4(out)
+        out = self.maxpool(out)
+        out = self.resblock5(out)
+        out = self.maxpool(out)
         out = out.view(out.shape[0], -1)
         # fully connected parts
         out = self.activation(self.fc1(out))
@@ -96,9 +102,9 @@ class EncoderDecoder(nn.Module):
         self.resblock1 = parts.ResBlock(n_hidden, n_hidden)
         self.resblock2 = parts.ResBlock(n_hidden, n_hidden)
         self.resblock3 = parts.ResBlock(n_hidden, n_hidden)
-        self.maxpool1 = nn.MaxPool2d(2, stride=2)
-        self.maxpool2 = nn.MaxPool2d(2, stride=2)
-        self.maxpool3 = nn.MaxPool2d(2, stride=2)
+        self.resblock4 = parts.ResBlock(n_hidden, n_hidden)
+        self.resblock5 = parts.ResBlock(n_hidden, n_hidden)
+        self.maxpool = nn.MaxPool2d(2, stride=2)
         # fc layers
         self.fc1 = nn.Linear(n_hidden * CHAN * CHAN, fc_hidden)
         self.fc_mean = nn.Linear(fc_hidden, fc_out)
@@ -111,8 +117,9 @@ class EncoderDecoder(nn.Module):
         self.out_resblock1 = parts.ResBlock(2 * n_hidden, n_hidden)
         self.out_resblock2 = parts.ResBlock(2 * n_hidden, n_hidden)
         self.out_resblock3 = parts.ResBlock(2 * n_hidden, n_hidden)
+        self.out_resblock4 = parts.ResBlock(2 * n_hidden, n_hidden)
         self.upsample = nn.Upsample(scale_factor=2)
-        self.out_resblock4 = parts.ResBlock(n_hidden, n_hidden)
+        self.out_resblock5 = parts.ResBlock(n_hidden, n_hidden)
         # Final output (will have inp_channels)
         self.out_conv = nn.Conv2d(n_hidden, 2*inp_channels, 3, padding=1)
 
@@ -127,14 +134,18 @@ class EncoderDecoder(nn.Module):
         out = outx + 0
         out = self.in_conv(out)
         out = self.resblock1(out)           # 64
-        out = self.maxpool1(out)            # 32
         out1 = out + 0
-        out = self.resblock2(out)           # 32
-        out = self.maxpool2(out)            # 16
+        out = self.resblock2(out)           # 64
         out2 = out + 0
-        out = self.resblock3(out)
-        out = self.maxpool3(out)            # 8
-        out3 = out + 0
+        out = self.resblock3(out)           # 64
+        out = self.maxpool(out)
+        out3 = out + 0                      # 32
+        out = self.resblock4(out)
+        out = self.maxpool(out)
+        out4 = out + 0                      # 16
+        out = self.resblock5(out)           # 16
+        out = self.maxpool(out)
+        out5 = out + 0                      # 8
 
         out = out.view(out.shape[0], -1)
         # fully connected parts
@@ -147,14 +158,15 @@ class EncoderDecoder(nn.Module):
         out = self.activation(self.out_fc2(out))
         out = out.view(out.shape[0], self.n_hidden, CHAN, CHAN)
         # Conv
-        out = self.out_resblock1(out, out3)
+        out = self.out_resblock1(out, out5)
         out = self.upsample(out)
-        out = self.out_resblock2(out, out2)
+        out = self.out_resblock2(out, out4)
         out = self.upsample(out)
-        out = self.out_resblock3(out, out1)
+        out = self.out_resblock3(out, out3)
         out = self.upsample(out)
+        out = self.out_resblock4(out, out2)
+        out = self.out_resblock5(out)
 
-        out = self.out_resblock4(out)
         out = self.out_conv(out)
         if self.last_activation is not None:
             out = self.last_activation(out)
