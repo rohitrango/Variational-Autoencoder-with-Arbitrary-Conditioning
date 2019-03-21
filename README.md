@@ -51,23 +51,33 @@ The structure of configuration files is inspired from the [Detectron](https://gi
 
 ## Quantitative Results
 
-### MNIST
-The only metric the paper supplied for MNIST was the negative log-likelihood. Although the log-likelihood doesn't make much sense since there can be many probable images with the same value of observed image, and hence a single solution may not be the image corresponding to the ground truth but may still be feasible. However, the metric is still well-behaved.
+### Baselines
+The metric used by the paper is negative log-likelihood for a bernoulli distribution (since the digits are binarized). Although the log-likelihood is not expected to be very low since there can be many probable images with the same value of observed image, and hence a single solution may not be the image corresponding to the ground truth but may still be feasible. However, the metric is still well-behaved.
 
 |		| Negative log-likelihood | 
 |-------|-------------------------|
 |MNIST	| 0.18557				  |
 
-The results are a little more meaningful for the image imputation tasks since the probability space of feasible images is now restricted given the image and mask. These are some of the baseline tasks to check sanity of the code and method. The paper measures PSNR scores between their and other methods. Note that these numbers are just some baselines used to perform a sanity check.
+The results are a little more useful for the image imputation tasks since the probability space of feasible images is now restricted given the image and mask. These are some of the baseline tasks to check sanity of the code and method. The paper measures PSNR scores between their and other methods. Note that these numbers are just some baselines used to perform a sanity check.
 
 
 | PSNR   | Random mask (p = 0.9)	 | Square mask (W = 20)  |
 |--------|---------------------------|-----------------------|
 | CelebA | 		22.1513				 | 		28.7348			 |	  
 
+The other results show numbers for the specific task given for CelebA dataset.
 
-The other results show numbers for the specific task given for CelebA dataset. (*Coming soon*)
+### Inpainting tasks
+Here is the table for PSNR of inpaintings for different masks. Higher values are better. I used a bigger architecture and ran for more iterations since I didn't have the exact architecture and training iterations in the paper. Here are some results:
 
+| Method/Masks        			 | Center 		| Pattern 	| Random 	| Half  	|
+|--------------------------------|--------------|-----------|-----------|-----------|
+| Context Encoder<sup>*</sup>    | 21.3   		| 19.2    	| 20.6   	| 15.5  	|
+| SIIDDGM<sup>*</sup>  	      	 | 19.4   		| 17.4    	| 22.8   	| 13.7  	|
+| VAEAC (1 sample)<sup>*</sup>   | 22.1  		| 21.4    	| **29.3**  | 14.9  	|
+| VAEAC (10 samples)<sup>*</sup> | 23.7   		| 23.3    	| **29.3**  | 17.4  	|
+| VAEAC (ours)       			 | **25.02**  	| **24.60** | 24.93  	| **17.48** |
+<sup>*</sup> = values taken from the paper
 
 ## Qualitative Results
 Here are some qualitative results on MNIST. The first image is the input to VAEAC. The other images are the samples drawn from the network. The last image is the ground truth. Note that given the partially observed input, the network successfully learns to output feasible outputs. The conditioning is arbitrary because each instance has a different subset of pixels which is observed. 
@@ -103,3 +113,5 @@ Here are some results on CelebA dataset with only 10% pixels retained in the inp
 **19 Mar 2019:** Compiled results for MNIST. Qualitative results look good, although not as diverse as the paper showed. Quantitative results are in the table. Also added results for CelebA dataset, with box masks, and dropping of random pixels.
 
 **20 Mar 2019:** Starting actual experiments performed in the paper now that sanity check is done.
+
+**21 Mar 2019:** Ran experiments on three tasks for CelebA - *Center, Random*, and *Half*. Both qualitative and quantitative results are at par with the paper. 
