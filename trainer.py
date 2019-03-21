@@ -87,8 +87,6 @@ def validate(cfg):
     ))
 
 
-
-
 def train(cfg):
     '''
     This is the main loop for training

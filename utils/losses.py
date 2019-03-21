@@ -50,7 +50,6 @@ class MSERecon(nn.Module):
 
         # If not validation, use the 3-termed loss,
         # else, just use the MSE between generated and ground truth
-        # print(float(recon_loss), float(kl_div), float(loss_reg))
         if not val:
             loss_val = recon_loss + cfg_reg['lambda_kl']*kl_div + cfg_reg['lambda_reg']*loss_reg
         else:

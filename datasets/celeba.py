@@ -50,7 +50,6 @@ def divide_dataset_basic(path, fraction=0.85):
             print 'copied {}'.format(filename)
         print "Copied all {} files to {}".format(key, cur_path)
 
-
 class CelebA(Dataset):
 
     '''
@@ -68,8 +67,28 @@ class CelebA(Dataset):
         self.type = cfg['dataset'].get('type', None)
         self.P = cfg['dataset'].get('p', 1)
         self.crop_size = crop_size
+        self.pattern_mask = self._get_pattern_mask()
         assert (mode in ['train', 'val']), 'mode in {} should be train/val'.format(self.__name__)
         self._get_files()
+
+
+    def _get_pattern_mask(self):
+        # Get the pattern mask described in the paper
+        image = np.random.rand(600, 600)
+        image = cv2.resize(image, (10000, 10000), cv2.INTER_CUBIC)
+        image = (image > 0.25).astype(float)
+        return image
+
+
+    def _get_pattern_sample(self):
+        # Get a mask sampled from the pattern image
+        # Fraction of pixels dropped, this value has to be between 20 and 30 percent
+        frac = 0
+        while not (frac >= 0.2 and frac <= 0.3):
+            y, x = np.random.randint(10000-64, size=(2, ))
+            mask = self.pattern_mask[y:y+64, x:x+64]
+            frac = 1 - (mask).mean()
+        return mask
 
 
     def _get_files(self):
@@ -95,16 +114,19 @@ class CelebA(Dataset):
             x_start, y_start = np.random.randint(image.shape[0] - self.height, size=(2, ))
             width, height = self.height, self.height
             mask[y_start:y_start+height, x_start:x_start+width] = 0
+
         # Center mask, create a mask of height H * H from center
         elif self.type == 'center':
             mask = np.ones(image.shape)[:, :, :1]
             c_y, c_x = image.shape[0]//2, image.shape[1]//2
             mask[c_y - self.height//2 : c_y + self.height//2, \
                  c_x - self.height//2 : c_x + self.height//2] = 0
+
         # Random mask, drop pixels randomly
         elif self.type == 'random':
             mask = np.random.rand(*image.shape)[:, :, :1]
             mask = (mask < self.P).astype(float)
+
         # Half mask, randomly pick one from left, right top bottom
         elif self.type == 'half':
             mask = np.ones(image.shape)[:, :, :1]
@@ -116,6 +138,11 @@ class CelebA(Dataset):
                 mask[:, leftStart:leftStart+32] = 0
             else:
                 mask[topStart:topStart+32, :] = 0
+
+        # Pattern mask, you got to sample from the pattern generated
+        elif self.type == 'pattern':
+            mask = self._get_pattern_sample()[:, :, None]
+
         # rest are not implemented for now
         else:
             raise NotImplementedError
