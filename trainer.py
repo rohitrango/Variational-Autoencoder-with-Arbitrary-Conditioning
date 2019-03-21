@@ -85,7 +85,6 @@ def validate(cfg):
         np.percentile(losses_list, 75),
     ))
 
-    print("PSNR: {}".format(10*np.log10(4/np.mean(losses_list))))
 
 
 

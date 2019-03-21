@@ -6,6 +6,14 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
+def rgb2y(image):
+    '''
+    Take input as RGB image batch and return batch of Y images
+    '''
+    img = image[:, 0:1]*0.299 + image[:, 1:2]*0.587 + image[:, 2:3]*0.114
+    return img
+
+
 class MSERecon(nn.Module):
     '''
     Loss function with Gaussian log-likelihood
@@ -19,8 +27,8 @@ class MSERecon(nn.Module):
 
         mask = (1 - inputs['mask'])
         recon_loss = mask*((outputs['out'][:, :channels] - inputs['image'])**2)
-        recon_loss = (recon_loss + ((outputs['out'][:, channels:] - inputs['image'])**2))
-        recon_loss = recon_loss.mean()/2.0/mask.mean()
+        recon_loss = (recon_loss/mask.mean() + ((outputs['out'][:, channels:] - inputs['image'])**2))
+        recon_loss = recon_loss.mean()/2.0
         # 2nd term
         mu1, logs1 = outputs['prop_mean'], outputs['prop_logs']
         mu2, logs2 = outputs['mean'], outputs['logs']
@@ -42,7 +50,14 @@ class MSERecon(nn.Module):
         if not val:
             loss_val = recon_loss + cfg_reg['lambda_kl']*kl_div + cfg_reg['lambda_reg']*loss_reg
         else:
-            loss_val = ((outputs['out'][:, channels:] - inputs['image'])**2).mean()
+            # loss_val = ((outputs['out'][:, channels:] - inputs['image'])**2).mean()
+            # Get PSNR here
+            imageY = inputs['image']
+            outY = outputs['out'][:, channels:]
+
+            loss_val = ((outY - imageY)**2).mean(1).mean(1).mean(1)
+            loss_val = 10*torch.log10(4.0/loss_val)
+            loss_val = loss_val.mean()
 
         return loss_val
 
