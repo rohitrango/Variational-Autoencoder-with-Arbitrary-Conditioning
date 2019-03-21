@@ -19,7 +19,7 @@ class ProposalNet(nn.Module):
                  n_hidden=16,
                  fc_hidden=50,
                  fc_out=16,
-                 activation=F.relu,
+                 activation=F.leaky_relu,
                 ):
         super(ProposalNet, self).__init__()
         self.inp_channels = inp_channels
@@ -31,7 +31,7 @@ class ProposalNet(nn.Module):
         self.resblock3 = parts.ResBlock(n_hidden, n_hidden)
         self.resblock4 = parts.ResBlock(n_hidden, n_hidden)
         self.resblock5 = parts.ResBlock(n_hidden, n_hidden)
-        self.maxpool = nn.MaxPool2d(2, stride=2)
+        self.pool = nn.AvgPool2d(2, stride=2)
         # fc layers
         self.fc1 = nn.Linear(n_hidden * CHAN * CHAN, fc_hidden)
         self.fc_mean = nn.Linear(fc_hidden, fc_out)
@@ -44,11 +44,11 @@ class ProposalNet(nn.Module):
         out = self.resblock1(out)
         out = self.resblock2(out)
         out = self.resblock3(out)
-        out = self.maxpool(out)
+        out = self.pool(out)
         out = self.resblock4(out)
-        out = self.maxpool(out)
+        out = self.pool(out)
         out = self.resblock5(out)
-        out = self.maxpool(out)
+        out = self.pool(out)
         out = out.view(out.shape[0], -1)
         # fully connected parts
         out = self.activation(self.fc1(out))
@@ -65,7 +65,7 @@ class EncoderDecoder(nn.Module):
     '''
     def __init__(self,
                  cfg,
-                 activation=F.relu,
+                 activation=F.leaky_relu,
                 ):
         super(EncoderDecoder, self).__init__()
         model_cfg = cfg['model']
@@ -104,7 +104,7 @@ class EncoderDecoder(nn.Module):
         self.resblock3 = parts.ResBlock(n_hidden, n_hidden)
         self.resblock4 = parts.ResBlock(n_hidden, n_hidden)
         self.resblock5 = parts.ResBlock(n_hidden, n_hidden)
-        self.maxpool = nn.MaxPool2d(2, stride=2)
+        self.pool = nn.AvgPool2d(2, stride=2)
         # fc layers
         self.fc1 = nn.Linear(n_hidden * CHAN * CHAN, fc_hidden)
         self.fc_mean = nn.Linear(fc_hidden, fc_out)
@@ -138,13 +138,13 @@ class EncoderDecoder(nn.Module):
         out = self.resblock2(out)           # 64
         out2 = out + 0
         out = self.resblock3(out)           # 64
-        out = self.maxpool(out)
+        out = self.pool(out)
         out3 = out + 0                      # 32
         out = self.resblock4(out)
-        out = self.maxpool(out)
+        out = self.pool(out)
         out4 = out + 0                      # 16
         out = self.resblock5(out)           # 16
-        out = self.maxpool(out)
+        out = self.pool(out)
         out5 = out + 0                      # 8
 
         out = out.view(out.shape[0], -1)
@@ -152,7 +152,12 @@ class EncoderDecoder(nn.Module):
         out = self.activation(self.fc1(out))
         mean = self.fc_mean(out)
         logs = self.fc_sigma(out)
-        sample = mean + torch.exp(logs)*torch.randn(mean.shape).to(mean.device)
+
+        if not self.training:
+            sample = mean + F.softplus(logs)*torch.randn(mean.shape).to(mean.device)
+        else:
+            sample = prop_mean + F.softplus(prop_logs)*torch.randn(mean.shape).to(mean.device)
+
         # Decoder net
         out = self.activation(self.out_fc1(sample))
         out = self.activation(self.out_fc2(out))

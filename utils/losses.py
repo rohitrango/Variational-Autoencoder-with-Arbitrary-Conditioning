@@ -30,10 +30,14 @@ class MSERecon(nn.Module):
         recon_loss = (recon_loss/mask.mean() + ((outputs['out'][:, channels:] - inputs['image'])**2))
         recon_loss = recon_loss.mean()/2.0
         # 2nd term
-        mu1, logs1 = outputs['prop_mean'], outputs['prop_logs']
-        mu2, logs2 = outputs['mean'], outputs['logs']
-        sigma1 = torch.exp(logs1)
-        sigma2 = torch.exp(logs2)
+        mu1, sig1 = outputs['prop_mean'], outputs['prop_logs']
+        mu2, sig2 = outputs['mean'], outputs['logs']
+        sigma1 = F.softplus(sig1)
+        sigma2 = F.softplus(sig2)
+
+        logs1 = torch.log(sigma1)
+        logs2 = torch.log(sigma2)
+
         # calculate kl div
         kl_div = (logs2 - logs1) + 0.5*(sigma1**2 + (mu1 - mu2)**2)/(sigma2**2) - 0.5
         kl_div = kl_div.mean()
@@ -95,8 +99,8 @@ class BCERecon(nn.Module):
         # 2nd term
         mu1, logs1 = outputs['prop_mean'], outputs['prop_logs']
         mu2, logs2 = outputs['mean'], outputs['logs']
-        sigma1 = torch.exp(logs1)
-        sigma2 = torch.exp(logs2)
+        sigma1 = F.softplus(logs1)
+        sigma2 = F.softplus(logs2)
         # calculate kl div
         kl_div = (logs2 - logs1) + 0.5*(sigma1**2 + (mu1 - mu2)**2)/(sigma2**2) - 0.5
         kl_div = kl_div.mean()

@@ -17,7 +17,7 @@ class ProposalNetMini(nn.Module):
                  n_hidden=16,
                  fc_hidden=50,
                  fc_out=16,
-                 activation=F.relu,
+                 activation=F.leaky_relu,
                 ):
         super(ProposalNetMini, self).__init__()
         self.inp_channels = inp_channels
@@ -26,8 +26,8 @@ class ProposalNetMini(nn.Module):
         self.in_conv = parts.InConv(inp_channels, n_hidden)
         self.resblock1 = parts.ResBlock(n_hidden, n_hidden) # 14 * 14
         self.resblock2 = parts.ResBlock(n_hidden, n_hidden) # 7 * 7
-        self.maxpool1 = nn.MaxPool2d(2, stride=2)
-        self.maxpool2 = nn.MaxPool2d(2, stride=2)
+        self.pool1 = nn.AvgPool2d(2, stride=2)
+        self.pool2 = nn.AvgPool2d(2, stride=2)
         # fc layers
         self.fc1 = nn.Linear(n_hidden * 7 * 7, fc_hidden)
         self.fc_mean = nn.Linear(fc_hidden, fc_out)
@@ -38,9 +38,9 @@ class ProposalNetMini(nn.Module):
         out = outx
         out = self.in_conv(out)
         out = self.resblock1(out)
-        out = self.maxpool1(out)
+        out = self.pool1(out)
         out = self.resblock2(out)
-        out = self.maxpool2(out)
+        out = self.pool2(out)
         out = out.view(out.shape[0], -1)
         # fully connected parts
         out = self.activation(self.fc1(out))
@@ -91,8 +91,8 @@ class EncoderDecoderNetMini(nn.Module):
         self.in_conv = parts.InConv(inp_channels + 1, n_hidden)
         self.resblock1 = parts.ResBlock(n_hidden, n_hidden) # 14 * 14
         self.resblock2 = parts.ResBlock(n_hidden, n_hidden) # 7 * 7
-        self.maxpool1 = nn.MaxPool2d(2, stride=2)
-        self.maxpool2 = nn.MaxPool2d(2, stride=2)
+        self.pool1 = nn.AvgPool2d(2, stride=2)
+        self.pool2 = nn.AvgPool2d(2, stride=2)
         # fc layers
         self.fc1 = nn.Linear(n_hidden * 7 * 7, fc_hidden)
         self.fc_mean = nn.Linear(fc_hidden, fc_out)
@@ -120,17 +120,21 @@ class EncoderDecoderNetMini(nn.Module):
         out = outx
         out = self.in_conv(out)
         out = self.resblock1(out)           # 28
-        out = self.maxpool1(out)            # 14
+        out = self.pool1(out)            # 14
         out1 = out
         out = self.resblock2(out)           # 14
-        out = self.maxpool2(out)            # 7
+        out = self.pool2(out)            # 7
         out2 = out
         out = out.view(out.shape[0], -1)
         # fully connected parts
         out = self.activation(self.fc1(out))
         mean = self.fc_mean(out)
         logs = self.fc_sigma(out)
-        sample = mean + torch.exp(logs)*torch.randn(mean.shape).to(mean.device)
+
+        if not self.training:
+            sample = mean + F.softplus(logs)*torch.randn(mean.shape).to(mean.device)
+        else:
+            sample = prop_mean + F.softplus(prop_logs)*torch.randn(mean.shape).to(mean.device)
 
         # Decoder net
         out = self.activation(self.out_fc1(sample))

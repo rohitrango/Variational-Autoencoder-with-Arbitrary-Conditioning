@@ -25,6 +25,7 @@ def validate(cfg):
     if use_cuda:
         model = model.cuda()
     model = utils.init_weights(model, cfg)
+    model.eval()
 
     # Get pretrained models, optimizers and loss functions
     optim = utils.get_optimizers(model, cfg)

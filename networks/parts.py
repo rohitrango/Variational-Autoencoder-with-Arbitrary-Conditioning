@@ -16,7 +16,7 @@ class ResBlock(nn.Module):
                  hid_ch=None,
                  kernel_size=3,
                  padding=1,
-                 activation=F.relu
+                 activation=F.leaky_relu
                 ):
         super(ResBlock, self).__init__()
         hid_ch = out_ch if hid_ch is None else hid_ch
@@ -56,7 +56,7 @@ class InConv(nn.Module):
                  out_ch,
                  kernel_size=3,
                  padding=1,
-                 activation=F.relu
+                 activation=F.leaky_relu
                 ):
         super(InConv, self).__init__()
         self.in_ch = in_ch
