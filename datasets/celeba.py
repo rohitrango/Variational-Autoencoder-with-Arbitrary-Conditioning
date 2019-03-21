@@ -89,12 +89,10 @@ class CelebA(Dataset):
 
 
     def _get_mask(self, idx, image):
-        # Get mask given in the config
-        rng = np.random.RandomState(idx)
-        # Check type
+        # Get mask given in the config by checking type
         if self.type is None:
             mask = np.ones(image.shape)[:, :, :1]
-            x_start, y_start = rng.randint(image.shape[0] - self.height, size=(2, ))
+            x_start, y_start = np.random.randint(image.shape[0] - self.height, size=(2, ))
             width, height = self.height, self.height
             mask[y_start:y_start+height, x_start:x_start+width] = 0
         # Center mask, create a mask of height H * H from center
@@ -107,6 +105,17 @@ class CelebA(Dataset):
         elif self.type == 'random':
             mask = np.random.rand(*image.shape)[:, :, :1]
             mask = (mask < self.P).astype(float)
+        # Half mask, randomly pick one from left, right top bottom
+        elif self.type == 'half':
+            mask = np.ones(image.shape)[:, :, :1]
+            # Get which half is to be masked in case one is chosen
+            # and then choose at random
+            leftStart, topStart = 32*np.random.randint(2, size=(2, ))
+            goLeft = np.random.rand() < 0.5
+            if goLeft:
+                mask[:, leftStart:leftStart+32] = 0
+            else:
+                mask[topStart:topStart+32, :] = 0
         # rest are not implemented for now
         else:
             raise NotImplementedError
@@ -140,6 +149,8 @@ if __name__ == '__main__':
     CFG = {
         'dataset': {
             'path': '/home/rohitrango/datasets/CelebA',
+            'type': 'half',
+            'h'   : 20,
         }
     }
     dataset = CelebA('train', CFG)
