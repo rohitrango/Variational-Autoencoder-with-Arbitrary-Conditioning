@@ -221,7 +221,7 @@ def save_images(data, outs, cfg, save_index, suffix=''):
         io.imsave('{}/{}_obs_{}.png'.format(cfg['save-path'], save_index, suffix), \
             re_normalize(data['observed'][0].data.cpu().numpy().transpose(1, 2, 0), cfg))
         io.imsave('{}/{}_out_{}.png'.format(cfg['save-path'], save_index, suffix), \
-            re_normalize(outs['out'][0].data.cpu().numpy().transpose(1, 2, 0)[:, :, :3], cfg))
+            re_normalize(outs['out'][0].data.cpu().numpy().transpose(1, 2, 0)[:, :, 3:], cfg))
         print "Saved for ckpt: {} {}".format(save_index, suffix)
 
     else:
@@ -249,7 +249,7 @@ def save_val_images(data, outs, cfg, save_index, suffix='val'):
         out_img = np.zeros((H, W*(N + 2), 3))
         out_img[:, :W] = data['observed'][0].data.cpu().numpy().transpose(1, 2, 0)
         for i in range(N):
-            out_img[:, (i+1)*W:(i+2)*W] = outs['out'][i, :3].data.cpu().numpy().transpose(1, 2, 0)
+            out_img[:, (i+1)*W:(i+2)*W] = outs['out'][i, 3:].data.cpu().numpy().transpose(1, 2, 0)
         out_img[:, -W:] = data['image'][0].data.cpu().numpy().transpose(1, 2, 0)
         # Save it
         io.imsave('{}/{}_val_out_{}.png'.format(cfg['save-path'], save_index, suffix),\
