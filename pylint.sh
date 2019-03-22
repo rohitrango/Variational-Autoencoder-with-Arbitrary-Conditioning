@@ -1,1 +1,2 @@
-pylint *.py */*.py
+pylint *.py datasets/*.py utils/*.py 
+
