@@ -12,6 +12,18 @@ from torch.utils.data import Dataset
 import numpy as np
 from matplotlib import pyplot as plt
 
+# Define the O1-O6 mask ranges here
+# The image is of 64 x 64
+o_masks = {
+    'o1': [16, 35, 26, 57],
+    'o2': [28, 35, 47, 57],
+    'o3': [14, 49, 26, 36],
+    'o4': [14, 33, 26, 36],
+    'o5': [30, 49, 26, 36],
+    'o6': [20, 43, 43, 61],
+}
+
+
 def divide_dataset_basic(path, fraction=0.85):
     '''
     Helper function for dividing the CelebA dataset into train or test sets
@@ -143,6 +155,12 @@ class CelebA(Dataset):
         elif self.type == 'pattern':
             mask = self._get_pattern_sample()[:, :, None]
 
+        # Else, one of the O1-O6 masks
+        elif self.type in o_masks.keys():
+            x1, x2, y1, y2 = o_masks[self.type]
+            mask = np.ones(image.shape)[:, :, :1]
+            mask[y1:y2, x1:x2] = 0
+
         # rest are not implemented for now
         else:
             raise NotImplementedError
@@ -176,7 +194,7 @@ if __name__ == '__main__':
     CFG = {
         'dataset': {
             'path': '/home/rohitrango/datasets/CelebA',
-            'type': 'half',
+            'type': 'o4',
             'h'   : 20,
         }
     }
