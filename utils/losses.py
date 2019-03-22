@@ -53,13 +53,16 @@ class MSERecon(nn.Module):
         if not val:
             loss_val = recon_loss + cfg_reg['lambda_kl']*kl_div + cfg_reg['lambda_reg']*loss_reg
         else:
-            # loss_val = ((outputs['out'][:, channels:] - inputs['image'])**2).mean()
             # Get PSNR here
             imageY = inputs['image']
             outY = outputs['out'][:, channels:]
 
+            # Take loss over all dimensions except batch
             loss_val = ((outY - imageY)**2).mean(1).mean(1).mean(1)
+            # Calculate PSNR for each image in batch -> 4 is in the term because the
+            # MSE is considering outputs are in range [-1, 1]
             loss_val = 10*torch.log10(4.0/loss_val)
+            # Now take average PSNR
             loss_val = loss_val.mean()
 
         return loss_val
