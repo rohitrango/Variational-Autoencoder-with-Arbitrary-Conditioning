@@ -73,12 +73,24 @@ Here is the table for PSNR of inpaintings for different masks. Higher values are
 | Method/Masks        			 | Center 		| Pattern 	| Random 	| Half  	|
 |--------------------------------|--------------|-----------|-----------|-----------|
 | Context Encoder<sup>*</sup>    | 21.3   		| 19.2    	| 20.6   	| 15.5  	|
-| SIIDDGM<sup>*</sup>  	      	 | 19.4   		| 17.4    	| 22.8   	| 13.7  	|
+| SIIDGM<sup>*</sup>  	      	 | 19.4   		| 17.4    	| 22.8   	| 13.7  	|
 | VAEAC (1 sample)<sup>*</sup>   | 22.1  		| 21.4    	| **29.3**  | 14.9  	|
 | VAEAC (10 samples)<sup>*</sup> | 23.7   		| 23.3    	| **29.3**  | 17.4  	|
 | VAEAC (this repo)   			 | **25.02**  	| **24.60** | 24.93  	| **17.48** |
 
 <sup>*</sup> = values taken from the paper
+
+
+Here is the table for PSNR for inpainting using other masks. Higher values are better. Again, my values of PSNR are much more than reported in the paper. It could be because I'm using a bigger architecture and training for longer.
+
+| Method/Masks        			 | O1 			| O2 		| O3 		| O4	  	| O5	  	| O6 		|
+|--------------------------------|--------------|-----------|-----------|-----------|-----------|-----------|
+| Context Encoder<sup>*</sup>    | 18.6   		| 18.4    	| 17.9  	| 19.0  	| 19.1		| 19.3		|
+| GFC<sup>*</sup>  	      	 	 | 20.0   		| 19.8    	| 18.8  	| 19.7  	| 19.5		| 20.2		|
+| VAEAC (1 sample)<sup>*</sup>   | 20.8  		| 21.0    	| 19.5  	| 20.3  	| 20.3		| 21.0		|
+| VAEAC (10 samples)<sup>*</sup> | 22.0   		| 22.2    	| 20.8  	| 21.7  	| 21.8 		| 22.2		|
+| VAEAC (this repo)   			 | **27.59**	| **33.20** | **30.32** | **31.38** | **32.28** | **28.20** |
+
 
 ## Qualitative Results
 Here are some qualitative results on MNIST. The first image is the input to VAEAC. The other images are the samples drawn from the network. The last image is the ground truth. Note that given the partially observed input, the network successfully learns to output feasible outputs. The conditioning is arbitrary because each instance has a different subset of pixels which is observed. 
@@ -109,4 +121,4 @@ Check out [`RESULTS.md`](https://github.com/rohitrango/ICLR-challenge/blob/maste
 
 **21 Mar 2019:** Ran experiments on three tasks for CelebA - *Center, Random*, and *Half*. Both qualitative and quantitative results are at par with the paper. 
 
-**22 Mar 2019:** Ran experiments on all 4 tasks and added qualitative and quantitative results. Also writing the code for the second set of experiments with O1-O6 masks.
+**22 Mar 2019:** Ran experiments on all 4 tasks and added qualitative and quantitative results. Also wrote the code for the second set of experiments with O1-O6 masks. Quantitative results look good.
