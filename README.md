@@ -76,7 +76,8 @@ Here is the table for PSNR of inpaintings for different masks. Higher values are
 | SIIDDGM<sup>*</sup>  	      	 | 19.4   		| 17.4    	| 22.8   	| 13.7  	|
 | VAEAC (1 sample)<sup>*</sup>   | 22.1  		| 21.4    	| **29.3**  | 14.9  	|
 | VAEAC (10 samples)<sup>*</sup> | 23.7   		| 23.3    	| **29.3**  | 17.4  	|
-| VAEAC (ours)       			 | **25.02**  	| **24.60** | 24.93  	| **17.48** |
+| VAEAC (this repo)   			 | **25.02**  	| **24.60** | 24.93  	| **17.48** |
+
 <sup>*</sup> = values taken from the paper
 
 ## Qualitative Results
@@ -88,24 +89,16 @@ Here are some qualitative results on MNIST. The first image is the input to VAEA
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/3.png)
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/4.png)
 ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/5.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/6.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/7.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/8.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/MNIST/9.png)
 
 Here are some results on CelebA dataset with only 10% pixels retained in the input.
 
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/0.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/1.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/2.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/3.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/8.png)
-<!-- ![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/5.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/6.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/7.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/4.png)
-![mnist-test](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random/9.png) -->
+![celeba-baseline](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random_baseline/0.png)
+![celeba-baseline](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random_baseline/1.png)
+![celeba-baseline](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random_baseline/2.png)
+![celeba-baseline](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random_baseline/3.png)
+![celeba-baseline](https://github.com/rohitrango/ICLR-challenge/blob/master/images/celebA_random_baseline/8.png)
 
+Check out [`RESULTS.md`](https://github.com/rohitrango/ICLR-challenge/blob/master/RESULTS.md) for more results.
 
 ## Updates
 **17 Mar 2019:** Set up the directory structure and general flow of the paper after reading and understanding the paper at the implementation level. Added dataloaders for MNIST and CelebA.
@@ -115,3 +108,5 @@ Here are some results on CelebA dataset with only 10% pixels retained in the inp
 **20 Mar 2019:** Starting actual experiments performed in the paper now that sanity check is done.
 
 **21 Mar 2019:** Ran experiments on three tasks for CelebA - *Center, Random*, and *Half*. Both qualitative and quantitative results are at par with the paper. 
+
+**22 Mar 2019:** Ran experiments on all 4 tasks and added qualitative and quantitative results. Also writing the code for the second set of experiments with O1-O6 masks.
