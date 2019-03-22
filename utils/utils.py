@@ -205,6 +205,10 @@ def re_normalize(image, cfg):
 def save_images(data, outs, cfg, save_index, suffix=''):
     '''
     Save black-and-white or colored images
+    Store 3 images:
+        - Original image
+        - Observed image (x_b)
+        - Output of the VAEAC
     '''
     if cfg['model']['inp_channels'] == 1:
         io.imsave('{}/{}_img_{}.png'.format(cfg['save-path'], save_index, suffix), \
@@ -212,7 +216,7 @@ def save_images(data, outs, cfg, save_index, suffix=''):
         io.imsave('{}/{}_obs_{}.png'.format(cfg['save-path'], save_index, suffix), \
             data['observed'][0, 0].data.cpu().numpy())
         io.imsave('{}/{}_out_{}.png'.format(cfg['save-path'], save_index, suffix), \
-            outs['out'][0, 0].data.cpu().numpy())
+            outs['out'][0, 1].data.cpu().numpy())
         print "Saved for ckpt: {} {}".format(save_index, suffix)
 
     elif cfg['model']['inp_channels'] == 3:
@@ -233,10 +237,12 @@ def save_val_images(data, outs, cfg, save_index, suffix='val'):
     Save images from validation for results
     The image is the same repeated N times for N samples
     '''
-    N, C, H, W = outs['out'].shape
+    N, _, H, W = outs['out'].shape
+
     if cfg['model']['inp_channels'] == 1:
         out_img = np.zeros((H, W*(N + 2)))
         out_img[:, :W] = data['observed'][0, 0].data.cpu().numpy()
+        # Paste the samples along the width axis
         for i in range(N):
             out_img[:, (i+1)*W:(i+2)*W] = outs['out'][i, 0].data.cpu().numpy()
         out_img[:, -W:] = data['image'][0, 0].data.cpu().numpy()
@@ -244,10 +250,14 @@ def save_val_images(data, outs, cfg, save_index, suffix='val'):
         io.imsave('{}/{}_val_out_{}.png'.format(cfg['save-path'], save_index, suffix),\
             out_img)
         print "Saved for ckpt: {} {}".format(save_index, suffix)
-    # Treat colored images a little differently
+
+
     elif cfg['model']['inp_channels'] == 3:
+        # Treat colored images a little differently
+        # Transpose is required to convert format from NCHW to NHWC
         out_img = np.zeros((H, W*(N + 2), 3))
         out_img[:, :W] = data['observed'][0].data.cpu().numpy().transpose(1, 2, 0)
+        # Paste the samples along the width axis
         for i in range(N):
             out_img[:, (i+1)*W:(i+2)*W] = outs['out'][i, 3:].data.cpu().numpy().transpose(1, 2, 0)
         out_img[:, -W:] = data['image'][0].data.cpu().numpy().transpose(1, 2, 0)
@@ -255,6 +265,7 @@ def save_val_images(data, outs, cfg, save_index, suffix='val'):
         io.imsave('{}/{}_val_out_{}.png'.format(cfg['save-path'], save_index, suffix),\
             (out_img + 1.0)/2.0)
         print "Saved for ckpt: {} {}".format(save_index, suffix)
+
     else:
         raise NotImplementedError
 
@@ -264,6 +275,6 @@ def repeat_data(data, cfg):
     Repeat data along the batch axis to get more samples
     '''
     samples = cfg['val']['num-samples']
-    for key, value in data.items():
+    for key in data.keys():
         data[key] = data[key].repeat(samples, 1, 1, 1)
     return data

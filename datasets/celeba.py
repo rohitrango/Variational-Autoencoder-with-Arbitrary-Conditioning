@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 
 # Define the O1-O6 mask ranges here
 # The image is of 64 x 64
-o_masks = {
+O_MASKS = {
     'o1': [16, 35, 26, 57],
     'o2': [28, 35, 47, 57],
     'o3': [14, 49, 26, 36],
@@ -27,7 +27,7 @@ o_masks = {
 def divide_dataset_basic(path, fraction=0.85):
     '''
     Helper function for dividing the CelebA dataset into train or test sets
-    
+
     Check if path exists or not
     and then create subsets accordingly
 
@@ -62,6 +62,7 @@ def divide_dataset_basic(path, fraction=0.85):
             print 'copied {}'.format(filename)
         print "Copied all {} files to {}".format(key, cur_path)
 
+
 class CelebA(Dataset):
 
     '''
@@ -77,7 +78,7 @@ class CelebA(Dataset):
         self.path = cfg['dataset']['path']
         self.height = cfg['dataset']['h']
         self.type = cfg['dataset'].get('type', None)
-        self.P = cfg['dataset'].get('p', 1)
+        self.p = cfg['dataset'].get('p', 1)
         self.crop_size = crop_size
         self.pattern_mask = self._get_pattern_mask()
         assert (mode in ['train', 'val']), 'mode in {} should be train/val'.format(self.__name__)
@@ -97,8 +98,8 @@ class CelebA(Dataset):
         # Fraction of pixels dropped, this value has to be between 20 and 30 percent
         frac = 0
         while not (frac >= 0.2 and frac <= 0.3):
-            y, x = np.random.randint(10000-64, size=(2, ))
-            mask = self.pattern_mask[y:y+64, x:x+64]
+            y_coord, x_coord = np.random.randint(10000-64, size=(2, ))
+            mask = self.pattern_mask[y_coord:y_coord+64, x_coord:x_coord+64]
             frac = 1 - (mask).mean()
         return mask
 
@@ -119,7 +120,7 @@ class CelebA(Dataset):
         return len(self.files)
 
 
-    def _get_mask(self, idx, image):
+    def _get_mask(self, image):
         # Get mask given in the config by checking type
         if self.type is None:
             mask = np.ones(image.shape)[:, :, :1]
@@ -137,29 +138,29 @@ class CelebA(Dataset):
         # Random mask, drop pixels randomly
         elif self.type == 'random':
             mask = np.random.rand(*image.shape)[:, :, :1]
-            mask = (mask < self.P).astype(float)
+            mask = (mask < self.p).astype(float)
 
         # Half mask, randomly pick one from left, right top bottom
         elif self.type == 'half':
             mask = np.ones(image.shape)[:, :, :1]
             # Get which half is to be masked in case one is chosen
             # and then choose at random
-            leftStart, topStart = 32*np.random.randint(2, size=(2, ))
-            goLeft = np.random.rand() < 0.5
-            if goLeft:
-                mask[:, leftStart:leftStart+32] = 0
+            left_start, top_start = 32*np.random.randint(2, size=(2, ))
+            go_left = np.random.rand() < 0.5
+            if go_left:
+                mask[:, left_start:left_start+32] = 0
             else:
-                mask[topStart:topStart+32, :] = 0
+                mask[top_start:top_start+32, :] = 0
 
         # Pattern mask, you got to sample from the pattern generated
         elif self.type == 'pattern':
             mask = self._get_pattern_sample()[:, :, None]
 
         # Else, one of the O1-O6 masks
-        elif self.type in o_masks.keys():
-            x1, x2, y1, y2 = o_masks[self.type]
+        elif self.type in O_MASKS.keys():
+            x_start, x_end, y_start, y_end = O_MASKS[self.type]
             mask = np.ones(image.shape)[:, :, :1]
-            mask[y1:y2, x1:x2] = 0
+            mask[y_start:y_end, x_start:x_end] = 0
 
         # rest are not implemented for now
         else:
@@ -179,7 +180,7 @@ class CelebA(Dataset):
         image = cv2.resize(image, (self.crop_size, self.crop_size))
         image = (image[:, :, ::-1]/255.0)*2 - 1
 
-        mask = self._get_mask(idx, image)
+        mask = self._get_mask(image)
         observed = mask*image
 
         return {

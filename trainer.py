@@ -33,10 +33,8 @@ def validate(cfg):
     loss_fn = utils.get_losses(cfg)
 
     # Set up random seeds
-    ckpt = 0
     if metadata is not None:
         seed = metadata['seed']
-        ckpt = metadata['ckpt']
     # Validation code, reproducibility is required
     seed = 42
 

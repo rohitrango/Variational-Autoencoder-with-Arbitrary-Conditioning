@@ -27,7 +27,8 @@ class MSERecon(nn.Module):
 
         mask = (1 - inputs['mask'])
         recon_loss = mask*((outputs['out'][:, :channels] - inputs['image'])**2)
-        recon_loss = (recon_loss/mask.mean() + ((outputs['out'][:, channels:] - inputs['image'])**2))
+        recon_loss = (recon_loss/mask.mean() \
+            + ((outputs['out'][:, channels:] - inputs['image'])**2))
         recon_loss = recon_loss.mean()/2.0
         # 2nd term
         mu1, sig1 = outputs['prop_mean'], outputs['prop_logs']
@@ -54,11 +55,11 @@ class MSERecon(nn.Module):
             loss_val = recon_loss + cfg_reg['lambda_kl']*kl_div + cfg_reg['lambda_reg']*loss_reg
         else:
             # Get PSNR here
-            imageY = inputs['image']
-            outY = outputs['out'][:, channels:]
+            ground_truth = inputs['image']
+            output_image = outputs['out'][:, channels:]
 
             # Take loss over all dimensions except batch
-            loss_val = ((outY - imageY)**2).mean(1).mean(1).mean(1)
+            loss_val = ((output_image - ground_truth)**2).mean(1).mean(1).mean(1)
             # Calculate PSNR for each image in batch -> 4 is in the term because the
             # MSE is considering outputs are in range [-1, 1]
             loss_val = 10*torch.log10(4.0/loss_val)
