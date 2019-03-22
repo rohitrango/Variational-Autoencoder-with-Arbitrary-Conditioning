@@ -112,6 +112,10 @@ Here are some results on CelebA dataset with only 10% pixels retained in the inp
 
 Check out [`RESULTS.md`](https://github.com/rohitrango/ICLR-challenge/blob/master/RESULTS.md) for more results.
 
+
+## Style Guide
+I have tried to follow PEP8 style guides for this project (PyLint score: 9.41/10, check out the config [here](https://github.com/rohitrango/ICLR-challenge/blob/master/.pylintrc)). Inspiration has been taken from [Detectron](https://github.com/facebookresearch/Detectron), [this repo](https://github.com/ms-sharma/Adversarial-Semisupervised-Semantic-Segmentation), and other open source repositories. If you want to contribute, please submit a PR.
+
 ## Updates
 **17 Mar 2019:** Set up the directory structure and general flow of the paper after reading and understanding the paper at the implementation level. Added dataloaders for MNIST and CelebA.
 
@@ -122,3 +126,7 @@ Check out [`RESULTS.md`](https://github.com/rohitrango/ICLR-challenge/blob/maste
 **21 Mar 2019:** Ran experiments on three tasks for CelebA - *Center, Random*, and *Half*. Both qualitative and quantitative results are at par with the paper. 
 
 **22 Mar 2019:** Ran experiments on all 4 tasks and added qualitative and quantitative results. Also wrote the code for the second set of experiments with O1-O6 masks. Quantitative results look good.
+
+
+## To-Do list
+- [ ] Upload all pretrained models to Drive.
