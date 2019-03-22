@@ -4,9 +4,10 @@ DATASET:
   MIN: -1
   MAX: 1
   H: 32
-  TYPE: CENTER
+  TYPE: RANDOM
+  P: 0.2
 TRAIN:
-  NUM-EPOCHS: 10000
+  NUM-EPOCHS: 1000
   SAVE-FREQ: 2000
   BATCH-SIZE: 128
   SHUFFLE: True
@@ -23,7 +24,7 @@ MODEL:
   INP_CHANNELS: 3
   N_HIDDEN: 32
   FC_HIDDEN: 100
-  FC_OUT: 32
+  FC_OUT: 50
   OPTIMIZER: ADAM
   LR: 0.001
   BETA1: 0.9
@@ -34,15 +35,15 @@ MODEL:
   WEIGHT-DECAY: 0.00001
   INIT: ORTHOGONAL
   LOSS: MSE
-  LR-OVERRIDE: True
+  LR-OVERRIDE: False
 REG:
   LAMBDA_KL: 1
   LAMBDA_REG: 1
   SIGMA_M: 10000
   SIGMA_S: 0.0001
-  APPLY_REG: False
+  APPLY_REG: True
 USE-CUDA: True
 PRETRAINED:
-PRETRAINED: '/home/rohitrango/dbdata/saved_models/celeba-center-crop/model_checkpoint_20000.pt'
-SAVE-PATH: '/home/rohitrango/dbdata/saved_models/celeba-center-crop'
+PRETRAINED: '/home/rohitrango/dbdata/saved_models/celeba-random/model_checkpoint_8000.pt'
+SAVE-PATH: '/home/rohitrango/dbdata/saved_models/celeba-random'
 PEEK-VALIDATION: 200

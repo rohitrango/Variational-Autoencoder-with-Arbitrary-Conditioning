@@ -4,9 +4,9 @@ DATASET:
   MIN: -1
   MAX: 1
   H: 32
-  TYPE: CENTER
+  TYPE: HALF
 TRAIN:
-  NUM-EPOCHS: 10000
+  NUM-EPOCHS: 1000
   SAVE-FREQ: 2000
   BATCH-SIZE: 128
   SHUFFLE: True
@@ -29,20 +29,20 @@ MODEL:
   BETA1: 0.9
   BETA2: 0.999
   SCHEDULER: STEP
-  DECAY-STEPS: 500
+  DECAY-STEPS: 2500
   DECAY-FACTOR: 0.995
   WEIGHT-DECAY: 0.00001
   INIT: ORTHOGONAL
   LOSS: MSE
-  LR-OVERRIDE: True
+  LR-OVERRIDE: False
 REG:
   LAMBDA_KL: 1
   LAMBDA_REG: 1
   SIGMA_M: 10000
   SIGMA_S: 0.0001
-  APPLY_REG: False
+  APPLY_REG: True
 USE-CUDA: True
-PRETRAINED:
-PRETRAINED: '/home/rohitrango/dbdata/saved_models/celeba-center-crop/model_checkpoint_20000.pt'
-SAVE-PATH: '/home/rohitrango/dbdata/saved_models/celeba-center-crop'
+PRETRAINED: 
+PRETRAINED: '/home/rohitrango/dbdata/saved_models/celeba-half/model_checkpoint_18000.pt'
+SAVE-PATH: '/home/rohitrango/dbdata/saved_models/celeba-half'
 PEEK-VALIDATION: 200

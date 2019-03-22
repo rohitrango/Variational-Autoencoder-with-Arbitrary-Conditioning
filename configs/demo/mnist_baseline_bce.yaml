@@ -2,6 +2,8 @@ DATASET:
   NAME: mnist
   PATH: '/home/rohitrango/datasets/MNIST/'
   H: 3
+  MIN: -1
+  MAX: 1
 TRAIN:
   NUM-EPOCHS: 10000
   SAVE-FREQ: 2000
@@ -9,8 +11,8 @@ TRAIN:
   SHUFFLE: True
   STEP-LOG: 5
 VAL:
-  BATCH-SIZE: 256
-  NUM-SAMPLES: 10
+  BATCH-SIZE: 2500
+  NUM-SAMPLES: 1
   SHUFFLE: True
   SAVE-IMG: False
 # Generator configuration
@@ -37,11 +39,10 @@ REG:
   LAMBDA_REG: 1
   SIGMA_M: 10000
   SIGMA_S: 0.0001
-  APPLY_REG: True
+  APPLY_REG: False
 
 USE-CUDA: True
 PRETRAINED: 
-PRETRAINED: '/home/rohitrango/dbdata/saved_models/mnist-del-row-bce-big/model_checkpoint_120000.pt' 
+PRETRAINED: '/home/rohitrango/dbdata/saved_models/mnist-del-row-bce-big/model_checkpoint_60000.pt' 
 SAVE-PATH: '/home/rohitrango/dbdata/saved_models/mnist-del-row-bce-big'
-PEEK-VALIDATION: 1000
-TYPE: PAIRED
+PEEK-VALIDATION: 200

@@ -4,18 +4,18 @@ DATASET:
   MIN: -1
   MAX: 1
   H: 32
-  TYPE: CENTER
+  TYPE: o1
 TRAIN:
-  NUM-EPOCHS: 10000
-  SAVE-FREQ: 2000
+  NUM-EPOCHS: 3
+  SAVE-FREQ: 1000
   BATCH-SIZE: 128
   SHUFFLE: True
   STEP-LOG: 5
 VAL:
-  BATCH-SIZE: 1
-  NUM-SAMPLES: 8
+  BATCH-SIZE: 1024
+  NUM-SAMPLES: 1
   SHUFFLE: True
-  SAVE-IMG: True
+  SAVE-IMG: False
 # model configuration
 MODEL:
   NAME: EncoderDecoderNet
@@ -34,7 +34,7 @@ MODEL:
   WEIGHT-DECAY: 0.00001
   INIT: ORTHOGONAL
   LOSS: MSE
-  LR-OVERRIDE: True
+  LR-OVERRIDE: False
 REG:
   LAMBDA_KL: 1
   LAMBDA_REG: 1
@@ -43,6 +43,6 @@ REG:
   APPLY_REG: False
 USE-CUDA: True
 PRETRAINED:
-PRETRAINED: '/home/rohitrango/dbdata/saved_models/celeba-center-crop/model_checkpoint_20000.pt'
-SAVE-PATH: '/home/rohitrango/dbdata/saved_models/celeba-center-crop'
+PRETRAINED: '/home/rohitrango/dbdata/saved_models/o1/model_checkpoint_4000.pt'
+SAVE-PATH: '/home/rohitrango/dbdata/saved_models/o1'
 PEEK-VALIDATION: 200
