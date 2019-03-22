@@ -26,13 +26,13 @@ You can use the `requirements.txt` file to install the packages.
 Datasets
 ├── CelebA
 │   └───img_align_celeba
-│   	├── 000003.png
+│       ├── 000003.png
 │       ├── 000048.png
 │       └─── ....
 └── MNIST
-	└───processed
-	    ├── test.pt
-	    └── training.pt
+    └───processed
+        ├── test.pt
+        └── training.pt
 ```
 - For CelebA, the training and validation split is created automatically.
 
@@ -54,42 +54,44 @@ The structure of configuration files is inspired from the [Detectron](https://gi
 ### Baselines
 The metric used by the paper is negative log-likelihood for a bernoulli distribution (since the digits are binarized). Although the log-likelihood is not expected to be very low since there can be many probable images with the same value of observed image, and hence a single solution may not be the image corresponding to the ground truth but may still be feasible. However, the metric is still well-behaved.
 
-|		| Negative log-likelihood | 
+|       | Negative log-likelihood | 
 |-------|-------------------------|
-|MNIST	| 0.18557				  |
+|MNIST  | 0.18557                 |
 
 The results are a little more useful for the image imputation tasks since the probability space of feasible images is now restricted given the image and mask. These are some of the baseline tasks to check sanity of the code and method. The paper measures PSNR scores between their and other methods. Note that these numbers are just some baselines used to perform a sanity check.
 
 
-| PSNR   | Random mask (p = 0.9)	 | Square mask (W = 20)  |
+| PSNR   | Random mask (p = 0.9)     | Square mask (W = 20)  |
 |--------|---------------------------|-----------------------|
-| CelebA | 		22.1513				 | 		28.7348			 |	  
+| CelebA |      22.1513              |      28.7348          |    
 
 The other results show numbers for the specific task given for CelebA dataset.
 
 ### Inpainting tasks
 Here is the table for PSNR of inpaintings for different masks. Higher values are better. I used a bigger architecture and ran for more iterations since I didn't have the exact architecture and training iterations in the paper. Here are some results:
 
-| Method/Masks        			 | Center 		| Pattern 	| Random 	| Half  	|
+| Method/Masks                   | Center       | Pattern   | Random    | Half      |
 |--------------------------------|--------------|-----------|-----------|-----------|
-| Context Encoder<sup>*</sup>    | 21.3   		| 19.2    	| 20.6   	| 15.5  	|
-| SIIDGM<sup>*</sup>  	      	 | 19.4   		| 17.4    	| 22.8   	| 13.7  	|
-| VAEAC (1 sample)<sup>*</sup>   | 22.1  		| 21.4    	| **29.3**  | 14.9  	|
-| VAEAC (10 samples)<sup>*</sup> | 23.7   		| 23.3    	| **29.3**  | 17.4  	|
-| VAEAC (this repo)   			 | **25.02**  	| **24.60** | 24.93  	| **17.48** |
+| Context Encoder<sup>*</sup>    | 21.3         | 19.2      | 20.6      | 15.5      |
+| SIIDGM<sup>*</sup>             | 19.4         | 17.4      | 22.8      | 13.7      |
+| VAEAC (1 sample)<sup>*</sup>   | 22.1         | 21.4      | **29.3**  | 14.9      |
+| VAEAC (10 samples)<sup>*</sup> | 23.7         | 23.3      | **29.3**  | 17.4      |
+| VAEAC (this repo)              | **25.02**    | **24.60** | 24.93     | **17.48** |
 
 <sup>*</sup> = values taken from the paper
 
 
-Here is the table for PSNR for inpainting using other masks. Higher values are better. Again, my values of PSNR are much more than reported in the paper. It could be because I'm using a bigger architecture and training for longer.
+Here is the table for PSNR for inpainting using other masks. Higher values are better. Again, the values of PSNR are better than reported in the paper. It could be because I'm using a bigger architecture and/or training for longer time (since the exact architecture and training times aren't specified in the paper).
 
-| Method/Masks        			 | O1 			| O2 		| O3 		| O4	  	| O5	  	| O6 		|
+| Method/Masks                   | O1           | O2        | O3        | O4        | O5        | O6        |
 |--------------------------------|--------------|-----------|-----------|-----------|-----------|-----------|
-| Context Encoder<sup>*</sup>    | 18.6   		| 18.4    	| 17.9  	| 19.0  	| 19.1		| 19.3		|
-| GFC<sup>*</sup>  	      	 	 | 20.0   		| 19.8    	| 18.8  	| 19.7  	| 19.5		| 20.2		|
-| VAEAC (1 sample)<sup>*</sup>   | 20.8  		| 21.0    	| 19.5  	| 20.3  	| 20.3		| 21.0		|
-| VAEAC (10 samples)<sup>*</sup> | 22.0   		| 22.2    	| 20.8  	| 21.7  	| 21.8 		| 22.2		|
-| VAEAC (this repo)   			 | **27.59**	| **33.20** | **30.32** | **31.38** | **32.28** | **28.20** |
+| Context Encoder<sup>*</sup>    | 18.6         | 18.4      | 17.9      | 19.0      | 19.1      | 19.3      |
+| GFC<sup>*</sup>                | 20.0         | 19.8      | 18.8      | 19.7      | 19.5      | 20.2      |
+| VAEAC (1 sample)<sup>*</sup>   | 20.8         | 21.0      | 19.5      | 20.3      | 20.3      | 21.0      |
+| VAEAC (10 samples)<sup>*</sup> | 22.0         | 22.2      | 20.8      | 21.7      | 21.8      | 22.2      |
+| VAEAC (this repo)              | **27.59**    | **33.20** | **30.32** | **31.38** | **32.28** | **28.20** |
+
+<sup>*</sup> = values taken from the paper
 
 
 ## Qualitative Results
@@ -112,7 +114,6 @@ Here are some results on CelebA dataset with only 10% pixels retained in the inp
 
 Check out [`RESULTS.md`](https://github.com/rohitrango/ICLR-challenge/blob/master/RESULTS.md) for more results.
 
-
 ## Style Guide
 I have tried to follow PEP8 style guides for this project (PyLint score: 9.41/10, check out the config [here](https://github.com/rohitrango/ICLR-challenge/blob/master/.pylintrc)). Inspiration has been taken from [Detectron](https://github.com/facebookresearch/Detectron), [this repo](https://github.com/ms-sharma/Adversarial-Semisupervised-Semantic-Segmentation), and other open source repositories. If you want to contribute, please submit a PR.
 
@@ -130,3 +131,16 @@ I have tried to follow PEP8 style guides for this project (PyLint score: 9.41/10
 
 ## To-Do list
 - [ ] Upload all pretrained models to Drive.
+
+## Citation
+If you liked this repository, and would like to use it in your work, consider citing the original paper
+```
+@inproceedings{
+    ivanov2018variational,
+    title={Variational Autoencoder with Arbitrary Conditioning},
+    author={Oleg Ivanov and Michael Figurnov and Dmitry Vetrov},
+    booktitle={International Conference on Learning Representations},
+    year={2019},
+    url={https://openreview.net/forum?id=SyxtJh0qYm},
+}
+```
