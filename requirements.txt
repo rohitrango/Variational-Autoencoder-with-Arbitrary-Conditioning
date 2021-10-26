@@ -1,4 +1,4 @@
-opencv-contrib-python==3.4.2.17
+opencv-contrib-python==4.2.0.32
 scipy>=0.17.0
 numpy==1.14.5
 torch==0.4.1
