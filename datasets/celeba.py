@@ -35,13 +35,13 @@ def divide_dataset_basic(path, fraction=0.85):
     Change the `fraction` if you want to change the split
     '''
     if exists(join(path, 'train')):
-        print 'Path {} exists'.format(path)
+        print('Path {} exists'.format(path))
         return
 
     # Divide into train and val
     all_files = None
     for root, _, all_files in os.walk(join(path, 'img_align_celeba')):
-        all_files = map(lambda x: join(root, x), all_files)
+        all_files = list(map(lambda x: join(root, x), all_files))
         break
     np.random.shuffle(all_files)
 
@@ -59,8 +59,8 @@ def divide_dataset_basic(path, fraction=0.85):
         os.makedirs(cur_path)
         for filename in files:
             shutil.copy(filename, cur_path)
-            print 'copied {}'.format(filename)
-        print "Copied all {} files to {}".format(key, cur_path)
+            print('copied {}'.format(filename))
+        print("Copied all {} files to {}".format(key, cur_path))
 
 
 class CelebA(Dataset):
@@ -194,13 +194,13 @@ class CelebA(Dataset):
 if __name__ == '__main__':
     CFG = {
         'dataset': {
-            'path': '/home/rohitrango/datasets/CelebA',
+            'path': 'datasets/CelebA',
             'type': 'o4',
             'h'   : 20,
         }
     }
     dataset = CelebA('train', CFG)
-    for i in range(len(dataset)):
+    for i in range(10):
         data = dataset.__getitem__(i)
         plt.subplot(1, 3, 1)
         plt.imshow((data['image'].numpy().transpose(1, 2, 0) + 1)/2.0)

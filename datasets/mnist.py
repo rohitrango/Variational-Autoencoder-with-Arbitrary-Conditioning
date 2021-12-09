@@ -4,10 +4,12 @@ Author: Rohit Jena
 '''
 from os.path import join
 
+import os
 import numpy as np
 import torch
 from torch.utils.data import Dataset
 from matplotlib import pyplot as plt
+import torchvision
 
 class MNISTRowDeleted(Dataset):
     '''
@@ -25,6 +27,11 @@ class MNISTRowDeleted(Dataset):
         # Get the files from path
         mode = 'training' if self.mode == 'train' else 'test'
         path = join(self.path, 'processed', mode + '.pt')
+        # If file doesn't exist, download it
+        if not os.path.exists(path):
+            tmpds = torchvision.datasets.MNIST(self.path, train=self.mode == 'train', download=True)
+            _ = tmpds[0]
+        # load images and labels
         self.images, self.labels = torch.load(path)
         self.images = self.images.float()
         self.images = ((self.images)/255.0)*2 - 1
@@ -56,7 +63,7 @@ class MNISTRowDeleted(Dataset):
 if __name__ == '__main__':
     CFG = {
         'dataset': {
-            'path': '/home/rohitrango/datasets/MNIST',
+            'path': 'datasets/',
             'h' : 3,
         }
     }

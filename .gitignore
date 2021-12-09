@@ -1,3 +1,6 @@
 *.pyc
 */*.pyc
 logs/*
+**/.DS_Store
+datasets/MNIST/
+datasets/CelebA/
