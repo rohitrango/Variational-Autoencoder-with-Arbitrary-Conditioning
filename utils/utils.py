@@ -17,7 +17,7 @@ from datasets.celeba import CelebA
 from datasets.mnist import MNISTRowDeleted
 
 from networks import mnist_vaeac, celeba_vaeac
-from losses import MSERecon, BCERecon
+from utils.losses import MSERecon, BCERecon
 
 # Dictionary of loss functions
 LOSS_DICT = {
@@ -116,7 +116,7 @@ def save_ckpt(model_and_optim, cfg, ckpt, seed, override=False):
 
         path = os.path.join(cfg['save-path'], 'model_checkpoint_{}.pt'.format(ckpt))
         torch.save(state_dict, path)
-        print 'Saved checkpoint at {}\n'.format(path)
+        print('Saved checkpoint at {}\n'.format(path))
 
 
 def get_losses(cfg):
@@ -217,7 +217,7 @@ def save_images(data, outs, cfg, save_index, suffix=''):
             data['observed'][0, 0].data.cpu().numpy())
         io.imsave('{}/{}_out_{}.png'.format(cfg['save-path'], save_index, suffix), \
             outs['out'][0, 1].data.cpu().numpy())
-        print "Saved for ckpt: {} {}".format(save_index, suffix)
+        print("Saved for ckpt: {} {}".format(save_index, suffix))
 
     elif cfg['model']['inp_channels'] == 3:
         io.imsave('{}/{}_img_{}.png'.format(cfg['save-path'], save_index, suffix), \
@@ -226,7 +226,7 @@ def save_images(data, outs, cfg, save_index, suffix=''):
             re_normalize(data['observed'][0].data.cpu().numpy().transpose(1, 2, 0), cfg))
         io.imsave('{}/{}_out_{}.png'.format(cfg['save-path'], save_index, suffix), \
             re_normalize(outs['out'][0].data.cpu().numpy().transpose(1, 2, 0)[:, :, 3:], cfg))
-        print "Saved for ckpt: {} {}".format(save_index, suffix)
+        print("Saved for ckpt: {} {}".format(save_index, suffix))
 
     else:
         raise NotImplementedError
@@ -249,7 +249,7 @@ def save_val_images(data, outs, cfg, save_index, suffix='val'):
         # Save it
         io.imsave('{}/{}_val_out_{}.png'.format(cfg['save-path'], save_index, suffix),\
             out_img)
-        print "Saved for ckpt: {} {}".format(save_index, suffix)
+        print("Saved for ckpt: {} {}".format(save_index, suffix))
 
 
     elif cfg['model']['inp_channels'] == 3:
@@ -264,7 +264,7 @@ def save_val_images(data, outs, cfg, save_index, suffix='val'):
         # Save it
         io.imsave('{}/{}_val_out_{}.png'.format(cfg['save-path'], save_index, suffix),\
             (out_img + 1.0)/2.0)
-        print "Saved for ckpt: {} {}".format(save_index, suffix)
+        print("Saved for ckpt: {} {}".format(save_index, suffix))
 
     else:
         raise NotImplementedError

@@ -1,6 +1,6 @@
 DATASET:
   NAME: celeba
-  PATH: '/home/rohitrango/datasets/CelebA/'
+  PATH: 'datasets/CelebA/'
   MIN: -1
   MAX: 1
   H: 32
@@ -43,6 +43,5 @@ REG:
   APPLY_REG: False
 USE-CUDA: True
 PRETRAINED:
-PRETRAINED: '/home/rohitrango/dbdata/saved_models/celeba-center-crop/model_checkpoint_20000.pt'
-SAVE-PATH: '/home/rohitrango/dbdata/saved_models/celeba-center-crop'
+SAVE-PATH: 'dbdata/saved_models/celeba-center-crop'
 PEEK-VALIDATION: 200

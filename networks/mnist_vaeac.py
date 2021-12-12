@@ -5,8 +5,7 @@ Author: Rohit Jena
 import torch
 import torch.nn.functional as F
 from torch import nn
-
-import parts as parts
+from networks import parts
 
 class ProposalNetMini(nn.Module):
     '''

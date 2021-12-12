@@ -27,10 +27,10 @@ if __name__ == '__main__':
 
     args = get_args().parse_args()
     if not os.path.exists(args.config):
-        print 'Config file {} does not exist.'.format(args.config)
+        print('Config file {} does not exist.'.format(args.config))
 
     with open(args.config, 'r') as fi:
-        CONFIG = yaml.load(fi.read())
+        CONFIG = yaml.safe_load(fi.read())
         CONFIG = utils.convert_to_lower(CONFIG)
 
     if args.mode == 'train':

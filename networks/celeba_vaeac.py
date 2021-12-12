@@ -6,7 +6,8 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-import parts as parts
+from networks import parts
+#import parts as parts
 CHAN = 8
 
 class ProposalNet(nn.Module):

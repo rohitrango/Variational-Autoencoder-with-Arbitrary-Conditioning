@@ -16,7 +16,7 @@ def validate(cfg):
     Main loop for validation, load the dataset, model, and
     other things. Run validation on the validation set
     '''
-    print json.dumps(cfg, sort_keys=True, indent=4)
+    print(json.dumps(cfg, sort_keys=True, indent=4))
 
     use_cuda = cfg['use-cuda']
     _, _, _, val_dl = utils.get_data_loaders(cfg)
@@ -66,7 +66,7 @@ def validate(cfg):
         ))
 
         if cfg['val']['save-img']:
-            print outputs['out'].shape
+            print(outputs['out'].shape)
             utils.save_val_images(data, outputs, cfg, idx)
 
     print("""
@@ -90,7 +90,7 @@ def train(cfg):
     This is the main loop for training
     Loads the dataset, model, and other things
     '''
-    print json.dumps(cfg, sort_keys=True, indent=4)
+    print(json.dumps(cfg, sort_keys=True, indent=4))
 
     use_cuda = cfg['use-cuda']
 
@@ -116,7 +116,7 @@ def train(cfg):
     # Get schedulers after getting checkpoints
     scheduler = utils.get_schedulers(optim, cfg, ckpt)
     # Print optimizer state
-    print optim
+    print(optim)
 
     # Get loss file handle to dump logs to
     if not os.path.exists(cfg['save-path']):
@@ -182,7 +182,7 @@ def train(cfg):
                         outputs = model(val_data)
                         loss_val = loss_fn(outputs, val_data, cfg)
 
-                        print 'Validation loss: {}'.format(loss_val.data.cpu().numpy())
+                        print('Validation loss: {}'.format(loss_val.data.cpu().numpy()))
 
                         lossesfile.write('Validation loss: {}\n'.format(\
                             loss_val.data.cpu().numpy()))
